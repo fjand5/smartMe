@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="padSize">5dp</dimen>
+    <dimen name="heightSize">50dp</dimen>
+    <dimen name="padSizeLarg">10dp</dimen>
+</resources>

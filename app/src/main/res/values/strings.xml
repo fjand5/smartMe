@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Smart Me</string>
+    <string name="padSize">5dp</string>
+
+    <string name="addr">Địa chỉ: </string>
+    <string name="port">Cổng: </string>
+    <string name="name">Tên: </string>
+    <string name="pass">Mật khẩu: </string>
+
+    <string name="save">Lưu thông tin </string>
+
+    <string name="fillInfo">Vui lòng nhập đủ thông tin kết nối</string>
+    <string name="saved">Đã lưu thông tin</string>
+    <string name="exit">Thoát</string>
+    <string name="notSave">Dữ liệu chưa được lưu</string>
+
+</resources>
