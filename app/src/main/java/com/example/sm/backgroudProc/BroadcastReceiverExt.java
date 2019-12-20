@@ -1,0 +1,38 @@
+package com.example.sm.backgroudProc;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
+
+abstract class BroadcastReceiverExt extends BroadcastReceiver {
+    final static int WAIT_FOR_RECONNECT = 3000;
+    String _actionName;
+
+    BroadcastReceiverExt(String  actionName){
+        _actionName=actionName;
+    }
+    void reCallMe(final Context context){
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent fintent = new Intent();
+                fintent.setAction(_actionName);
+                fintent.setFlags(Intent.FLAG_RECEIVER_FOREGROUND);
+                context.sendBroadcast(fintent);
+            }
+        },WAIT_FOR_RECONNECT);
+    }
+    public void startMe(Context context){
+        Intent mIntent = new Intent();
+        mIntent.setAction(_actionName);
+        context.sendBroadcast(mIntent);
+
+
+    }
+
+}
+

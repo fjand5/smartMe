@@ -13,5 +13,7 @@
     <string name="saved">Đã lưu thông tin</string>
     <string name="exit">Thoát</string>
     <string name="notSave">Dữ liệu chưa được lưu</string>
+    <string name="notConnect">Chưa kết nối</string>
+    <string name="isConnecting">Đã kết nối</string>
 
 </resources>

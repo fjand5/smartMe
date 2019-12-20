@@ -113,9 +113,9 @@ public class SettingActivity extends Activity implements TextWatcher, View.OnCli
 
         MqttInfo = getSharedPreferences(SettingActivity.class.getName(),MODE_PRIVATE);
         MqttInfo.edit().putString("addrTxt",addrTxt.getText().toString())
-                .putString("portTxt",addrTxt.getText().toString())
-                .putString("nameTxt",addrTxt.getText().toString())
-                .putString("passTxt",addrTxt.getText().toString()).apply();
+                .putString("portTxt",portTxt.getText().toString())
+                .putString("nameTxt",nameTxt.getText().toString())
+                .putString("passTxt",passTxt.getText().toString()).apply();
 
     }
     private void updateData() {

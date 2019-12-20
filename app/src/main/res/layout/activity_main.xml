@@ -18,26 +18,31 @@
             android:layout_height="wrap_content"
             >
             <ImageView
-
+                android:id="@+id/statusImg"
                 android:layout_height="40dp"
                 android:layout_width="40dp"
                 android:layout_centerInParent="true"
                 android:layout_alignParentBottom="true"
                 android:src="@drawable/ic_connected"
+                android:visibility="invisible"
+
                 />
 
             <ProgressBar
+                android:id="@+id/statusBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_alignParentBottom="true"
                 android:indeterminateTint="@color/ColorConnecting"
+                android:visibility="invisible"
                />
         </RelativeLayout>
 
 
 
         <TextView
+            android:id="@+id/statusTxt"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:layout_width="wrap_content"
