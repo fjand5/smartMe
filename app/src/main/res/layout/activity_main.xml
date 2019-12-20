@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
     <RelativeLayout
@@ -61,7 +62,75 @@
             android:layout_alignParentRight="true" />
 
     </RelativeLayout>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:weightSum="5"
+            android:padding="@dimen/padSize">
+
+            <TextView
+                android:id="@+id/rxDataTxt"
+                android:layout_width="match_parent"
+                android:layout_weight="4"
+                android:layout_height="0dp"
+                android:background="@drawable/border_textview"
+                android:paddingHorizontal="@dimen/padSizeLarg"
+                android:gravity="bottom"
+                />
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/padSize"/>
+            <EditText
+                android:id="@+id/txDataTxt"
+                android:background="@drawable/border_textview"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:hint="@string/hintData4Send"
+                android:textSize="@dimen/textSize"
+                android:padding="@dimen/padSize"/>
+            <View
+                android:layout_height="@dimen/padSize"
+                android:layout_width="match_parent"/>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:weightSum="5">
+                <EditText
+                    android:id="@+id/topicDataTxt"
+                    android:background="@drawable/border_textview"
+                    android:layout_height="match_parent"
+                    android:layout_width="wrap_content"
+                    android:layout_weight="3"
+                    android:hint="@string/topicHint"
+                    android:textSize="@dimen/textSize"
+                    android:padding="@dimen/padSize"/>
+                <View
+                    android:layout_width="@dimen/padSize"
+                    android:layout_height="match_parent"/>
+
+                <Button
+                    android:padding="@dimen/padSize"
+                    android:id="@+id/sendBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="@string/send"
+                    android:background="@drawable/button"/>
+            </LinearLayout>
+
+
+        </LinearLayout>
+    </ScrollView>
 
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>

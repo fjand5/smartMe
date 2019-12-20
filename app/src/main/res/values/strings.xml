@@ -16,5 +16,8 @@
     <string name="notConnect">Chưa kết nối</string>
     <string name="isConnecting">Đã kết nối</string>
     <string name="topicName">Topic</string>
+    <string name="send">send</string>
+    <string name="hintData4Send">Dữ liệu cần gửi</string>
+    <string name="topicHint">topic</string>
 
 </resources>

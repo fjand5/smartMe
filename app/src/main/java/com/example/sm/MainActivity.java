@@ -7,7 +7,11 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.se.omapi.SEService;
+import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -18,6 +22,7 @@ import com.example.sm.backgroudProc.MainService;
 import com.example.sm.backgroudProc.MqttBroadcast;
 import com.example.sm.view.SettingActivity;
 
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.w3c.dom.Text;
 
 import static android.widget.Toast.LENGTH_LONG;
@@ -28,6 +33,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
     TextView statusTxt;
     ProgressBar statusBar;
 
+    TextView rxDataTxt;
+    EditText topicDataTxt;
+    EditText txDataTxt;
+    Button sendBtn;
 
 
     @Override
@@ -36,6 +45,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         setContentView(R.layout.activity_main);
         initView();
+        addEvent();
         MainService.beginService(this);
 
 
@@ -50,8 +60,23 @@ public class MainActivity extends Activity implements View.OnClickListener {
             public void onConnect() {
                 setStatusView(true);
             }
+
+            @Override
+            public void messageArrived(String topic, MqttMessage message) {
+                String content = new String(message.getPayload());
+                if(message.isRetained())
+                    topic = "*" + topic;
+                rxDataTxt.append(topic+" : "+ content + "\n\r\n\r");
+
+            }
         }));
 
+    }
+
+    private void addEvent() {
+        sendBtn.setOnClickListener(this);
+        rxDataTxt.setMovementMethod(new ScrollingMovementMethod());
+        settingImg.setOnClickListener(this);
     }
 
     private void initView() {
@@ -59,7 +84,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
         statusBar = findViewById(R.id.statusBar);
         statusTxt = findViewById(R.id.statusTxt);
         settingImg = findViewById(R.id.settingImg);
-        settingImg.setOnClickListener(this);
+
+        rxDataTxt = findViewById(R.id.rxDataTxt);
+        topicDataTxt = findViewById(R.id.topicDataTxt);
+        txDataTxt = findViewById(R.id.txDataTxt);
+        sendBtn = findViewById(R.id.sendBtn);
+
     }
 
     @Override
@@ -68,8 +98,16 @@ public class MainActivity extends Activity implements View.OnClickListener {
             case R.id.settingImg:
                 callSettingActivity();
                 break;
+            case R.id.sendBtn:
+                sendData();
+                break;
         }
 
+    }
+
+    private void sendData() {
+        Log.d("htl",topicDataTxt.getText().toString());
+        MqttBroadcast.publish(topicDataTxt.getText().toString(),txDataTxt.getText().toString());
     }
 
     private void callSettingActivity() {

@@ -133,8 +133,8 @@ public class MqttBroadcast extends BroadcastReceiverExt {
 
             @Override
             public void messageArrived(String topic, MqttMessage message) {
-                String content = new String(message.getPayload());
-                Toast.makeText(mContext,content,Toast.LENGTH_LONG).show();
+                onConnectStatusChange.messageArrived( topic,  message);
+
             }
 
             @Override
@@ -151,8 +151,17 @@ public class MqttBroadcast extends BroadcastReceiverExt {
         }
 
     }
+    static public void publish(String topic, String content){
+        try {
+            client.publish(topic ,content.getBytes(),2,false);
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+
+    }
     public interface OnConnectStatusChange{
         void onDisconnect();
         void onConnect();
+        void messageArrived(String topic, MqttMessage message);
     }
 }

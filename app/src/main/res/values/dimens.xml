@@ -3,4 +3,5 @@
     <dimen name="padSize">5dp</dimen>
     <dimen name="heightSize">50dp</dimen>
     <dimen name="padSizeLarg">10dp</dimen>
+    <dimen name="textSize">20sp</dimen>
 </resources>
