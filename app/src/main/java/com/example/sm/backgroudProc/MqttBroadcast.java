@@ -23,18 +23,29 @@ import static android.content.Context.MODE_PRIVATE;
 
 
 public class MqttBroadcast extends BroadcastReceiverExt {
-    static ListenConnect listenConnect;
-    public static void setListenConnect(ListenConnect callback){
-        listenConnect=callback;
-    }
+    static OnConnectStatusChange onConnectStatusChange;
+    static public boolean connectNow = false;
 
     static Context mContext;
+
+   MqttConnectOptions options;
+   String clientId;
+  public static MqttAndroidClient client;
+    private  IMqttActionListener mqttListenner;
+    MqttCallback callbackMQTT;
 
     static String _add;
     static int _port;
     static String _user;
     static String _pass;
-    static String[] _topicRx;
+    static String _topicRx;
+
+    public static boolean setOnConnectStatusChange(OnConnectStatusChange callback){
+        onConnectStatusChange=callback;
+        if(client == null)
+            return false;
+        return client.isConnected();
+    }
 
     static String getActionName(){
         return MqttBroadcast.class.getName();
@@ -42,7 +53,7 @@ public class MqttBroadcast extends BroadcastReceiverExt {
     MqttBroadcast() {
         super(MqttBroadcast.class.getName());
     }
-    public static void setInfo(){
+    public static void getInfo(){
         SharedPreferences MqttInfo;
         MqttInfo = mContext.getSharedPreferences(SettingActivity.class.getName(),MODE_PRIVATE);
 
@@ -54,9 +65,10 @@ public class MqttBroadcast extends BroadcastReceiverExt {
             _port = 0;
         }
 
-        _user=MqttInfo.getString("nameTxt","");
-        _pass=MqttInfo.getString("passTxt","");
-        _topicRx= new String[]{"luat/espAL/tx", ""};
+        _user= MqttInfo.getString("nameTxt","");
+        _pass= MqttInfo.getString("passTxt","");
+        _topicRx= MqttInfo.getString("topicTxt","");
+
     }
 
     @Override
@@ -64,14 +76,11 @@ public class MqttBroadcast extends BroadcastReceiverExt {
         mContext = context;
         initMqttConnection();
 
+
     }
-    void initMqttConnection(){
-        setInfo();
-        MqttConnectOptions options;
-        String clientId;
-        final MqttAndroidClient client;
-        IMqttActionListener mqttListenner;
-        MqttCallback callbackMQTT;
+    public  void initMqttConnection(){
+        getInfo();
+
 
 
         options = new MqttConnectOptions();
@@ -87,14 +96,14 @@ public class MqttBroadcast extends BroadcastReceiverExt {
         mqttListenner = new IMqttActionListener() {
             @Override
             public void onSuccess(IMqttToken asyncActionToken) {
-                listenConnect.onConnect();
-                Log.d("htl","onSuccess");
-
+                connectNow=false;
+                if(onConnectStatusChange != null)
+                    onConnectStatusChange.onConnect();
 
                 try {
-                    for (String s: _topicRx) {
-                        client.subscribe(s,2);
-                    }
+
+                    client.subscribe(_topicRx,2);
+
 
                 } catch (MqttException e) {
                     e.printStackTrace();
@@ -104,7 +113,8 @@ public class MqttBroadcast extends BroadcastReceiverExt {
 
             @Override
             public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                listenConnect.onDisconnect();
+                if(onConnectStatusChange != null)
+                    onConnectStatusChange.onDisconnect();
                 reCallMe(mContext);
 
             }
@@ -113,8 +123,12 @@ public class MqttBroadcast extends BroadcastReceiverExt {
 
             @Override
             public void connectionLost(Throwable cause) {
-                listenConnect.onDisconnect();
-                reCallMe(mContext);
+                if(onConnectStatusChange != null)
+                    onConnectStatusChange.onDisconnect();
+                if(connectNow)
+                    reCallMe(mContext,0);
+                else
+                    reCallMe(mContext);
             }
 
             @Override
@@ -137,7 +151,7 @@ public class MqttBroadcast extends BroadcastReceiverExt {
         }
 
     }
-    public interface ListenConnect{
+    public interface OnConnectStatusChange{
         void onDisconnect();
         void onConnect();
     }

@@ -108,6 +108,27 @@
                 android:inputType="textPassword"/>
         </LinearLayout>
         <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:paddingRight="@dimen/heightSize"
+            android:paddingLeft="10dp"
+            android:layout_weight="1">
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="@dimen/heightSize"
+                android:text="@string/topicName"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:paddingRight="@dimen/padSize" />
+            <EditText
+                android:id="@+id/topicTxt"
+                android:layout_width="250dp"
+                android:layout_height="@dimen/heightSize"
+                android:layout_gravity="center"
+                />
+        </LinearLayout>
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"

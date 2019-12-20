@@ -14,7 +14,7 @@ abstract class BroadcastReceiverExt extends BroadcastReceiver {
     BroadcastReceiverExt(String  actionName){
         _actionName=actionName;
     }
-    void reCallMe(final Context context){
+    void reCallMe(final Context context, int timeDelay){
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -24,8 +24,13 @@ abstract class BroadcastReceiverExt extends BroadcastReceiver {
                 fintent.setFlags(Intent.FLAG_RECEIVER_FOREGROUND);
                 context.sendBroadcast(fintent);
             }
-        },WAIT_FOR_RECONNECT);
+        },timeDelay);
     }
+    void reCallMe(final Context context){
+        reCallMe(context,WAIT_FOR_RECONNECT);
+    }
+
+
     public void startMe(Context context){
         Intent mIntent = new Intent();
         mIntent.setAction(_actionName);

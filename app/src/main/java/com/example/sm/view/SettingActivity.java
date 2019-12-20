@@ -15,10 +15,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.sm.R;
+import com.example.sm.backgroudProc.MqttBroadcast;
+
+import org.eclipse.paho.client.mqttv3.MqttException;
 
 
 public class SettingActivity extends Activity implements TextWatcher, View.OnClickListener {
-    EditText addrTxt,portTxt,nameTxt,passTxt;
+    EditText addrTxt,portTxt,nameTxt,passTxt,topicTxt;
     TextView checkTxt;
     Button saveBtn,exitBtn;
 
@@ -53,6 +56,7 @@ public class SettingActivity extends Activity implements TextWatcher, View.OnCli
         portTxt = findViewById(R.id.portTxt);
         nameTxt = findViewById(R.id.nameTxt);
         passTxt = findViewById(R.id.passTxt);
+        topicTxt = findViewById(R.id.topicTxt);
 
         saveBtn = findViewById(R.id.saveBtn);
         exitBtn = findViewById(R.id.exitBtn);
@@ -100,6 +104,7 @@ public class SettingActivity extends Activity implements TextWatcher, View.OnCli
             case R.id.saveBtn:
                 saveInfo();
                 Toast.makeText(this, getResources().getString(R.string.saved),Toast.LENGTH_LONG).show();
+                finish();
                 break;
             case R.id.exitBtn:
                 finish();
@@ -112,10 +117,20 @@ public class SettingActivity extends Activity implements TextWatcher, View.OnCli
     private void saveInfo() {
 
         MqttInfo = getSharedPreferences(SettingActivity.class.getName(),MODE_PRIVATE);
-        MqttInfo.edit().putString("addrTxt",addrTxt.getText().toString())
-                .putString("portTxt",portTxt.getText().toString())
-                .putString("nameTxt",nameTxt.getText().toString())
-                .putString("passTxt",passTxt.getText().toString()).apply();
+        SharedPreferences.Editor editor = MqttInfo.edit();
+        editor.putString("addrTxt",addrTxt.getText().toString()).commit();
+        editor.putString("portTxt",portTxt.getText().toString()).commit();
+        editor.putString("nameTxt",nameTxt.getText().toString()).commit();
+        editor.putString("passTxt",passTxt.getText().toString()).commit();
+        editor.putString("topicTxt",topicTxt.getText().toString()).commit();
+
+        try {
+            MqttBroadcast.connectNow=true;
+            MqttBroadcast.client.disconnect();
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+
 
     }
     private void updateData() {
@@ -124,6 +139,9 @@ public class SettingActivity extends Activity implements TextWatcher, View.OnCli
         portTxt.setText(MqttInfo.getString("portTxt",""));
         nameTxt.setText(MqttInfo.getString("nameTxt",""));
         passTxt.setText(MqttInfo.getString("passTxt",""));
+        topicTxt.setText(MqttInfo.getString("topicTxt",""));
 
     }
+
+
 }
