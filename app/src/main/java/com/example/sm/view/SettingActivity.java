@@ -20,6 +20,7 @@ import com.example.sm.BackgroudProccess.MqttBroadcast;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.util.ArrayList;
+import java.util.Dictionary;
 
 
 public class SettingActivity extends Activity implements TextWatcher, View.OnClickListener {
@@ -40,12 +41,12 @@ public class SettingActivity extends Activity implements TextWatcher, View.OnCli
     }
 
     private void updateData() {
-        ArrayList<Object> tmp= MqttSetting.getInstance().getInfo(this);
-        addrTxt.setText(tmp.get(0).toString());
-    portTxt.setText(tmp.get(1).toString());
-    nameTxt.setText(tmp.get(2).toString());
-    passTxt.setText(tmp.get(3).toString());
-    topicTxt.setText(tmp.get(4).toString());
+        Dictionary<String, Object> tmp= MqttSetting.getInstance().getInfo(this);
+        addrTxt.setText(tmp.get("address").toString());
+        portTxt.setText(tmp.get("port").toString());
+        nameTxt.setText(tmp.get("username").toString());
+        passTxt.setText(tmp.get("password").toString());
+        topicTxt.setText(tmp.get("topic").toString());
     }
 
 
@@ -99,7 +100,6 @@ public class SettingActivity extends Activity implements TextWatcher, View.OnCli
             checkTxt.setText(
                     ""
             );
-
         }
         else{
             saveBtn.setEnabled(false);

@@ -9,6 +9,8 @@ import com.example.sm.Model.MqttInfo;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
 
 public class MqttSetting{
@@ -30,15 +32,16 @@ public class MqttSetting{
             }
 
     }
-    public ArrayList<Object> getInfo(Context context){
-        ArrayList<Object>  ret = new ArrayList<>();
+
+    public Dictionary<String, Object> getInfo(Context context){
+        Dictionary<String, Object>  ret = new Hashtable<>();
         MqttInfo mqttInfo = MqttInfo.getInstance();
 
-        ret.add(mqttInfo.getAddress(context));
-        ret.add(mqttInfo.getPort(context));
-        ret.add(mqttInfo.getUsername(context));
-        ret.add(mqttInfo.getPassword(context));
-        ret.add(mqttInfo.getTopic(context));
+        ret.put("address",mqttInfo.getAddress(context));
+        ret.put("port",mqttInfo.getPort(context));
+        ret.put("username",mqttInfo.getUsername(context));
+        ret.put("password",mqttInfo.getPassword(context));
+        ret.put("topic",mqttInfo.getTopic(context));
 
     return  ret;
     }

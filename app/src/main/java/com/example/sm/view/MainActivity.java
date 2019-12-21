@@ -15,11 +15,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 
+import com.example.sm.Presenter.MqttSetting;
+import com.example.sm.Presenter.RxDataListView.Adapter;
+import com.example.sm.Presenter.RxDataListView.Item;
 import com.example.sm.R;
 import com.example.sm.BackgroudProccess.MainService;
 import com.example.sm.BackgroudProccess.MqttBroadcast;
 
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends Activity implements View.OnClickListener {
@@ -29,6 +35,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
 
     ListView rxDataLsv;
+    Adapter adapter;
+
     EditText topicDataTxt;
     EditText txDataTxt;
     Button sendBtn;
@@ -37,14 +45,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onStart() {
         super.onStart();
-        if(topicDataTxt.getText().equals("")){
-            String topic;
-            SharedPreferences MqttInfo = getSharedPreferences(SettingActivity.class.getName(),MODE_PRIVATE);
-            topic = MqttInfo.getString("nameTxt","#");
-            topicDataTxt.setText(topic+"/");
-        }
+            String topic  =  MqttSetting.getInstance().getInfo(this).get("topic").toString();
 
-
+            topicDataTxt.setText(topic);
     }
 
     @Override
@@ -55,13 +58,16 @@ public class MainActivity extends Activity implements View.OnClickListener {
         initView();
         addEvent();
         MainService.beginService(this);
+        setStatusView(Adapter.getStatus());
+    }
 
-
-        setStatusView(MqttBroadcast.setOnConnectStatusChange(new MqttBroadcast.OnConnectStatusChange() {
+    private void addEvent() {
+        sendBtn.setOnClickListener(this);
+        settingImg.setOnClickListener(this);
+        adapter.setOnEventMqtt(new Adapter.Callback() {
             @Override
             public void onDisconnect() {
                 setStatusView(false);
-                
             }
 
             @Override
@@ -69,21 +75,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 setStatusView(true);
             }
 
-            @Override
-            public void messageArrived(String topic, MqttMessage message) {
-                String content = new String(message.getPayload());
-                if(message.isRetained())
-                    topic = "*" + topic;
-
-
-            }
-        }));
-
-    }
-
-    private void addEvent() {
-        sendBtn.setOnClickListener(this);
-        settingImg.setOnClickListener(this);
+        });
     }
 
     private void initView() {
@@ -93,6 +85,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
         settingImg = findViewById(R.id.settingImg);
 
         rxDataLsv = findViewById(R.id.rxDataLsv);
+
+
+        adapter = Adapter.getInstance(this,R.layout.item_rx_data,new ArrayList<Item>());
+        rxDataLsv.setAdapter(adapter);
+
+
         topicDataTxt = findViewById(R.id.topicDataTxt);
         txDataTxt = findViewById(R.id.txDataTxt);
         sendBtn = findViewById(R.id.sendBtn);
@@ -113,9 +111,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void sendData() {
-        Log.d("htl",topicDataTxt.getText().toString());
-        MqttBroadcast.publish(topicDataTxt.getText().toString(),txDataTxt.getText().toString());
-        txDataTxt.setText("");
+        Adapter.sendData(topicDataTxt.getText().toString(),txDataTxt.getText().toString());
     }
 
     private void callSettingActivity() {

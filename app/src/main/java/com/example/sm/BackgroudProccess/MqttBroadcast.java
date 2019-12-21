@@ -20,6 +20,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.util.ArrayList;
+import java.util.Dictionary;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -42,8 +43,11 @@ public class MqttBroadcast extends BroadcastReceiverExt {
     static String _pass;
     static String _topicRx;
 
-    public static boolean setOnConnectStatusChange(OnConnectStatusChange callback){
+    public static void setOnConnectStatusChange(OnConnectStatusChange callback){
         onConnectStatusChange=callback;
+
+    }
+    public static boolean getStatus(){
         if(client == null)
             return false;
         return client.isConnected();
@@ -56,17 +60,17 @@ public class MqttBroadcast extends BroadcastReceiverExt {
         super(MqttBroadcast.class.getName());
     }
     public static void getInfo(){
-        ArrayList<?> tmp = MqttSetting.getInstance().getInfo(mContext);
-        _add=tmp.get(0).toString();
+        Dictionary<String,Object> tmp = MqttSetting.getInstance().getInfo(mContext);
+        _add=tmp.get("address").toString();
         try {
-            _port=Integer.valueOf(tmp.get(1).toString());
+            _port=Integer.valueOf(tmp.get("port").toString());
         } catch (NumberFormatException nfe) {
             _port = 0;
         }
 
-        _user= tmp.get(2).toString();
-        _pass= tmp.get(3).toString();
-        _topicRx=tmp.get(4).toString();
+        _user= tmp.get("username").toString();
+        _pass= tmp.get("password").toString();
+        _topicRx=tmp.get("topic").toString();
 
     }
 
@@ -151,6 +155,9 @@ public class MqttBroadcast extends BroadcastReceiverExt {
 
     }
     static public void publish(String topic, String content){
+        publish(topic ,content,false);
+    }
+    static public void publish(String topic, String content, boolean retain){
         try {
             client.publish(topic ,content.getBytes(),2,false);
         } catch (MqttException e) {

@@ -19,5 +19,6 @@
     <string name="send">send</string>
     <string name="hintData4Send">Dữ liệu cần gửi</string>
     <string name="topicHint">topic</string>
+    <string name="ok">ok</string>
 
 </resources>

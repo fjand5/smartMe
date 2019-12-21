@@ -81,7 +81,8 @@
                 android:layout_height="0dp"
                 android:background="@drawable/border_textview"
                 android:paddingHorizontal="@dimen/padSizeLarg"
-                android:gravity="bottom"
+                android:padding="@dimen/padSize"
+                android:stackFromBottom="true"
                 />
             <View
                 android:layout_width="wrap_content"
