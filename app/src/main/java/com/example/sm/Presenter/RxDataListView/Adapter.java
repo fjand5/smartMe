@@ -95,6 +95,7 @@ public class Adapter  extends ArrayAdapter<Item> {
             @Override
             public boolean onLongClick(View view) {
                 return false;
+                
             }
         });
 
