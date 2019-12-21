@@ -1,0 +1,81 @@
+package com.example.sm.Model;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import com.example.sm.BackgroudProccess.MqttBroadcast;
+import com.example.sm.view.SettingActivity;
+
+import org.eclipse.paho.client.mqttv3.MqttException;
+
+public class MqttInfo implements  IMqttInfo{
+    SharedPreferences MqttInfoData;
+    static MqttInfo instance;
+    private MqttInfo(){};
+    public static MqttInfo getInstance(){
+        if(instance == null){
+            instance = new MqttInfo();
+        }
+        return instance;
+    };
+
+    @Override
+    public String getAddress(Context context) {
+
+        if(instance == null)
+            return "";
+        else
+            return getSharedPreferences(context).getString("address","");
+    }
+
+    @Override
+    public int getPort(Context context) {
+        if(instance == null)
+            return 0;
+        else
+            return getSharedPreferences(context).getInt("port",0);
+    }
+
+    @Override
+    public String getUsername(Context context) {
+        if(instance == null)
+            return "";
+        else
+            return getSharedPreferences(context).getString("username","");
+    }
+
+    @Override
+    public String getPassword(Context context) {
+        if(instance == null)
+            return "";
+        else
+            return getSharedPreferences(context).getString("password","");
+    }
+
+    @Override
+    public String getTopic(Context context) {
+        if(instance == null)
+            return "";
+        return getSharedPreferences(context).getString("topic","");
+    }
+
+    @Override
+    public void setInfo(Context context, String addr, int port, String name, String pass, String topic) {
+
+            SharedPreferences.Editor editor = getSharedPreferences(context).edit();
+            editor.putString("address",addr).commit();
+            editor.putInt("port",port).commit();
+            editor.putString("username",name).commit();
+            editor.putString("password",pass).commit();
+            editor.putString("topic",topic).commit();
+    }
+    private SharedPreferences getSharedPreferences(Context context){
+        SharedPreferences  ret;
+        ret = context.getSharedPreferences(
+                com.example.sm.Model.MqttInfo.class.toString()
+                ,context.MODE_PRIVATE);
+
+        return ret;
+    }
+
+}

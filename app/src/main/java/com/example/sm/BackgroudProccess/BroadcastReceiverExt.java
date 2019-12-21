@@ -1,11 +1,9 @@
-package com.example.sm.backgroudProc;
+package com.example.sm.BackgroudProccess;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 
 abstract class BroadcastReceiverExt extends BroadcastReceiver {
     final static int WAIT_FOR_RECONNECT = 3000;

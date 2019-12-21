@@ -1,31 +1,25 @@
-package com.example.sm;
+package com.example.sm.view;
 
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.os.Build;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.se.omapi.SEService;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
-import com.example.sm.backgroudProc.MainService;
-import com.example.sm.backgroudProc.MqttBroadcast;
-import com.example.sm.view.SettingActivity;
+import com.example.sm.R;
+import com.example.sm.BackgroudProccess.MainService;
+import com.example.sm.BackgroudProccess.MqttBroadcast;
 
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.w3c.dom.Text;
-
-import static android.widget.Toast.LENGTH_LONG;
 
 
 public class MainActivity extends Activity implements View.OnClickListener {
@@ -33,11 +27,25 @@ public class MainActivity extends Activity implements View.OnClickListener {
     TextView statusTxt;
     ProgressBar statusBar;
 
-    TextView rxDataTxt;
+
+    ListView rxDataLsv;
     EditText topicDataTxt;
     EditText txDataTxt;
     Button sendBtn;
 
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(topicDataTxt.getText().equals("")){
+            String topic;
+            SharedPreferences MqttInfo = getSharedPreferences(SettingActivity.class.getName(),MODE_PRIVATE);
+            topic = MqttInfo.getString("nameTxt","#");
+            topicDataTxt.setText(topic+"/");
+        }
+
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +74,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 String content = new String(message.getPayload());
                 if(message.isRetained())
                     topic = "*" + topic;
-                rxDataTxt.append(topic+" : "+ content + "\n\r\n\r");
+
 
             }
         }));
@@ -75,7 +83,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private void addEvent() {
         sendBtn.setOnClickListener(this);
-        rxDataTxt.setMovementMethod(new ScrollingMovementMethod());
         settingImg.setOnClickListener(this);
     }
 
@@ -85,7 +92,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         statusTxt = findViewById(R.id.statusTxt);
         settingImg = findViewById(R.id.settingImg);
 
-        rxDataTxt = findViewById(R.id.rxDataTxt);
+        rxDataLsv = findViewById(R.id.rxDataLsv);
         topicDataTxt = findViewById(R.id.topicDataTxt);
         txDataTxt = findViewById(R.id.txDataTxt);
         sendBtn = findViewById(R.id.sendBtn);
@@ -108,6 +115,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private void sendData() {
         Log.d("htl",topicDataTxt.getText().toString());
         MqttBroadcast.publish(topicDataTxt.getText().toString(),txDataTxt.getText().toString());
+        txDataTxt.setText("");
     }
 
     private void callSettingActivity() {

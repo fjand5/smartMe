@@ -1,12 +1,12 @@
-package com.example.sm.backgroudProc;
+package com.example.sm.BackgroudProccess;
 
 import android.content.Context;
 import android.content.Intent;
 
 import android.content.SharedPreferences;
-import android.util.Log;
-import android.widget.Toast;
 
+import com.example.sm.Model.MqttInfo;
+import com.example.sm.Presenter.MqttSetting;
 import com.example.sm.view.SettingActivity;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
@@ -19,6 +19,8 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import java.util.ArrayList;
+
 import static android.content.Context.MODE_PRIVATE;
 
 
@@ -30,7 +32,7 @@ public class MqttBroadcast extends BroadcastReceiverExt {
 
    MqttConnectOptions options;
    String clientId;
-  public static MqttAndroidClient client;
+    public static MqttAndroidClient client;
     private  IMqttActionListener mqttListenner;
     MqttCallback callbackMQTT;
 
@@ -54,20 +56,17 @@ public class MqttBroadcast extends BroadcastReceiverExt {
         super(MqttBroadcast.class.getName());
     }
     public static void getInfo(){
-        SharedPreferences MqttInfo;
-        MqttInfo = mContext.getSharedPreferences(SettingActivity.class.getName(),MODE_PRIVATE);
-
-
-        _add=MqttInfo.getString("addrTxt","");
+        ArrayList<?> tmp = MqttSetting.getInstance().getInfo(mContext);
+        _add=tmp.get(0).toString();
         try {
-            _port=Integer.valueOf(MqttInfo.getString("portTxt",""));
+            _port=Integer.valueOf(tmp.get(1).toString());
         } catch (NumberFormatException nfe) {
             _port = 0;
         }
 
-        _user= MqttInfo.getString("nameTxt","");
-        _pass= MqttInfo.getString("passTxt","");
-        _topicRx= MqttInfo.getString("topicTxt","");
+        _user= tmp.get(2).toString();
+        _pass= tmp.get(3).toString();
+        _topicRx=tmp.get(4).toString();
 
     }
 

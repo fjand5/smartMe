@@ -15,7 +15,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".view.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -25,7 +25,7 @@
         <activity android:name=".view.SettingActivity"/>
         <service android:name="org.eclipse.paho.android.service.MqttService">
         </service>
-        <service android:name=".backgroudProc.MainService"/>
+        <service android:name=".BackgroudProccess.MainService"/>
     </application>
 
 </manifest>

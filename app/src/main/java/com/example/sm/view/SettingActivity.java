@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 
 import android.view.View;
 import android.widget.Button;
@@ -14,10 +13,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.sm.Presenter.MqttSetting;
 import com.example.sm.R;
-import com.example.sm.backgroudProc.MqttBroadcast;
+import com.example.sm.BackgroudProccess.MqttBroadcast;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
+
+import java.util.ArrayList;
 
 
 public class SettingActivity extends Activity implements TextWatcher, View.OnClickListener {
@@ -25,7 +27,7 @@ public class SettingActivity extends Activity implements TextWatcher, View.OnCli
     TextView checkTxt;
     Button saveBtn,exitBtn;
 
-    SharedPreferences MqttInfo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,12 +39,36 @@ public class SettingActivity extends Activity implements TextWatcher, View.OnCli
 
     }
 
+    private void updateData() {
+        ArrayList<Object> tmp= MqttSetting.getInstance().getInfo(this);
+        addrTxt.setText(tmp.get(0).toString());
+    portTxt.setText(tmp.get(1).toString());
+    nameTxt.setText(tmp.get(2).toString());
+    passTxt.setText(tmp.get(3).toString());
+    topicTxt.setText(tmp.get(4).toString());
+    }
 
 
     private void addEvent() {
         addrTxt.addTextChangedListener(this);
         portTxt.addTextChangedListener(this);
-        nameTxt.addTextChangedListener(this);
+        nameTxt.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                checkInfo();
+                topicTxt.setText(s);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
         passTxt.addTextChangedListener(this);
         saveBtn.setOnClickListener(this);
         exitBtn.setOnClickListener(this);
@@ -115,32 +141,15 @@ public class SettingActivity extends Activity implements TextWatcher, View.OnCli
     }
 
     private void saveInfo() {
+        MqttSetting.getInstance().setInfo(
+                this,
+                addrTxt.getText().toString(),
+        Integer.parseInt(portTxt.getText().toString()),
+        nameTxt.getText().toString(),
+        passTxt.getText().toString(),
+        topicTxt.getText().toString()
 
-        MqttInfo = getSharedPreferences(SettingActivity.class.getName(),MODE_PRIVATE);
-        SharedPreferences.Editor editor = MqttInfo.edit();
-        editor.putString("addrTxt",addrTxt.getText().toString()).commit();
-        editor.putString("portTxt",portTxt.getText().toString()).commit();
-        editor.putString("nameTxt",nameTxt.getText().toString()).commit();
-        editor.putString("passTxt",passTxt.getText().toString()).commit();
-        editor.putString("topicTxt",topicTxt.getText().toString()).commit();
-
-        try {
-            MqttBroadcast.connectNow=true;
-            MqttBroadcast.client.disconnect();
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
-
-
-    }
-    private void updateData() {
-        MqttInfo = getSharedPreferences(SettingActivity.class.getName(),MODE_PRIVATE);
-        addrTxt.setText(MqttInfo.getString("addrTxt",""));
-        portTxt.setText(MqttInfo.getString("portTxt",""));
-        nameTxt.setText(MqttInfo.getString("nameTxt",""));
-        passTxt.setText(MqttInfo.getString("passTxt",""));
-        topicTxt.setText(MqttInfo.getString("topicTxt",""));
-
+                );
     }
 
 

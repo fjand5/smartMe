@@ -1,4 +1,4 @@
-package com.example.sm.backgroudProc;
+package com.example.sm.BackgroudProccess;
 
 import android.app.ActivityManager;
 
@@ -11,7 +11,6 @@ import android.os.Build;
 
 import android.os.IBinder;
 
-import android.util.Log;
 import android.widget.Toast;
 
 

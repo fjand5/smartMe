@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".view.MainActivity">
 
     <RelativeLayout
         android:orientation="horizontal"
@@ -74,8 +74,8 @@
             android:weightSum="5"
             android:padding="@dimen/padSize">
 
-            <TextView
-                android:id="@+id/rxDataTxt"
+            <ListView
+                android:id="@+id/rxDataLsv"
                 android:layout_width="match_parent"
                 android:layout_weight="4"
                 android:layout_height="0dp"
@@ -111,12 +111,14 @@
                     android:layout_weight="3"
                     android:hint="@string/topicHint"
                     android:textSize="@dimen/textSize"
-                    android:padding="@dimen/padSize"/>
+                    android:padding="@dimen/padSize"
+                    android:layout_marginVertical="@dimen/padSize"/>
                 <View
                     android:layout_width="@dimen/padSize"
                     android:layout_height="match_parent"/>
 
                 <Button
+                    android:layout_marginVertical="@dimen/padSize"
                     android:padding="@dimen/padSize"
                     android:id="@+id/sendBtn"
                     android:layout_width="wrap_content"
