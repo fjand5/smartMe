@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -91,6 +92,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         rxDataLsv.setAdapter(adapter);
 
 
+
         topicDataTxt = findViewById(R.id.topicDataTxt);
         txDataTxt = findViewById(R.id.txDataTxt);
         sendBtn = findViewById(R.id.sendBtn);
@@ -130,5 +132,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
             statusTxt.setText(getResources().getText(R.string.notConnect));
             statusTxt.setTextColor(getResources().getColor(R.color.red));
         }
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if(event.getAction()==MotionEvent.ACTION_DOWN
+                && event.getX()<getResources().getDimension(R.dimen.padSize)){
+            Log.d("htl","ggg");
+        }
+        return super.onTouchEvent(event);
     }
 }

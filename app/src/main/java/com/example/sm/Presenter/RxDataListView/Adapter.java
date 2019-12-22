@@ -65,6 +65,7 @@ public class Adapter  extends ArrayAdapter<Item> {
                 if(listItem !=null){
                     listItem.add(new Item(message.isRetained(), topic, new String(message.getPayload())));
                     Adapter.instance.notifyDataSetInvalidated();
+
                 }
 
             }
@@ -80,6 +81,7 @@ public class Adapter  extends ArrayAdapter<Item> {
         if(v == null){
             LayoutInflater layoutInflater = LayoutInflater.from(mContext);
             v = layoutInflater.inflate(R.layout.item_rx_data,null);
+
         }
         v.setOnClickListener(new View.OnClickListener() {
             @Override

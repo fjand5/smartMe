@@ -3,7 +3,10 @@
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:weightSum="5"
-    android:padding="@dimen/padSize"
+    android:fadingEdge="vertical"
+    android:fadeScrollbars="true"
+    android:requiresFadingEdge="vertical"
+    android:fadingEdgeLength="@dimen/padSize"
     >
     <TextView
         android:id="@+id/topicItemTxt"
@@ -13,7 +16,11 @@
         android:layout_weight="2"
         android:textSize="@dimen/textSize"
         android:padding="@dimen/padSize"
-        android:layout_marginVertical="@dimen/padSize"/>
+        android:layout_marginVertical="@dimen/padSize"
+        android:fadingEdge="vertical"
+        android:requiresFadingEdge="vertical"
+        android:fadingEdgeLength="@dimen/padSize"
+        android:lines="1"/>
     <View
         android:layout_width="@dimen/padSize"
         android:layout_height="0dp"/>
@@ -25,5 +32,6 @@
         android:layout_width="0dp"
         android:textSize="@dimen/textSize"
         android:padding="@dimen/padSize"
-        android:layout_marginVertical="@dimen/padSize"/>
+        android:layout_marginVertical="@dimen/padSize"
+        android:lines="1"/>
 </LinearLayout>

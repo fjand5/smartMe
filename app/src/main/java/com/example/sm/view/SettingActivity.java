@@ -62,11 +62,12 @@ public class SettingActivity extends Activity implements TextWatcher, View.OnCli
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 checkInfo();
-                topicTxt.setText(s);
+
             }
 
             @Override
             public void afterTextChanged(Editable s) {
+                topicTxt.setText(s+"/#");
 
             }
         });
