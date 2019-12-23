@@ -2,132 +2,145 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".view.MainActivity">
+    android:layout_width="match_parent"
+    android:orientation="horizontal">
 
-    <RelativeLayout
+    <LinearLayout
+        android:id="@+id/fragMenuPos"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@color/colorPrimary"
-        app:layout_constraintTop_toTopOf="parent">
-        <RelativeLayout
-            android:padding="5dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            >
-            <ImageView
-                android:id="@+id/statusImg"
-                android:layout_height="40dp"
-                android:layout_width="40dp"
-                android:layout_centerInParent="true"
-                android:layout_alignParentBottom="true"
-                android:src="@drawable/ic_connected"
-                android:visibility="invisible"
-
-                />
-
-            <ProgressBar
-                android:id="@+id/statusBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_alignParentBottom="true"
-                android:indeterminateTint="@color/ColorConnecting"
-                android:visibility="invisible"
-               />
-        </RelativeLayout>
-
-
-
-        <TextView
-            android:id="@+id/statusTxt"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_gravity="center"
-            android:text="Trạng Thái Kết Nối"/>
-
-        <ImageView
-            android:id="@+id/settingImg"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:src="@drawable/ic_setting"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true" />
-
-    </RelativeLayout>
+        tools:ignore="Suspicious0dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:weightSum="5"
-        android:padding="@dimen/padSize">
+        tools:context=".view.MainActivity">
 
-        <ListView
-            android:id="@+id/rxDataLsv"
-            android:layout_width="match_parent"
-            android:layout_weight="4"
-            android:layout_height="0dp"
-            android:stackFromBottom="true"
-            android:background="@drawable/border_textview"
-            android:padding="@dimen/padSize"
-            />
-        <View
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/padSize"/>
-        <EditText
-            android:id="@+id/txDataTxt"
-            android:background="@drawable/border_textview"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:hint="@string/hintData4Send"
-            android:textSize="@dimen/textSize"
-            android:padding="@dimen/padSize"/>
-        <View
-            android:layout_height="@dimen/padSize"
-            android:layout_width="match_parent"/>
-
-        <LinearLayout
+        <RelativeLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:weightSum="5">
-            <EditText
-                android:id="@+id/topicDataTxt"
-                android:background="@drawable/border_textview"
-                android:layout_height="match_parent"
-                android:layout_width="wrap_content"
-                android:layout_weight="3"
-                android:hint="@string/topicHint"
-                android:textSize="@dimen/textSize"
-                android:padding="@dimen/padSize"
-                android:layout_marginVertical="@dimen/padSize"/>
-            <View
-                android:layout_width="@dimen/padSize"
-                android:layout_height="match_parent"/>
-
-            <Button
-                android:layout_marginVertical="@dimen/padSize"
-                android:padding="@dimen/padSize"
-                android:id="@+id/sendBtn"
+            android:layout_height="50dp"
+            android:background="@color/colorPrimary"
+            app:layout_constraintTop_toTopOf="parent">
+            <RelativeLayout
+                android:padding="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:text="@string/send"
-                android:background="@drawable/button"/>
+                >
+                <ImageView
+                    android:id="@+id/statusImg"
+                    android:layout_height="40dp"
+                    android:layout_width="40dp"
+                    android:layout_centerInParent="true"
+                    android:layout_alignParentBottom="true"
+                    android:src="@drawable/ic_connected"
+                    android:visibility="invisible"
+
+                    />
+
+                <ProgressBar
+                    android:id="@+id/statusBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_alignParentBottom="true"
+                    android:indeterminateTint="@color/ColorConnecting"
+                    android:visibility="invisible"
+                    />
+            </RelativeLayout>
+
+
+
+            <TextView
+                android:id="@+id/statusTxt"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:text="Trạng Thái Kết Nối"/>
+
+            <ImageView
+                android:id="@+id/settingImg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:src="@drawable/ic_setting"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:weightSum="5"
+            android:padding="@dimen/padSize">
+
+            <ListView
+                android:id="@+id/rxDataLsv"
+                android:layout_width="match_parent"
+                android:layout_weight="4"
+                android:layout_height="0dp"
+                android:stackFromBottom="true"
+                android:background="@drawable/border_textview"
+                android:padding="@dimen/padSize"
+                />
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/padSize"/>
+            <EditText
+                android:id="@+id/txDataTxt"
+                android:background="@drawable/border_textview"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:hint="@string/hintData4Send"
+                android:textSize="@dimen/textSize"
+                android:padding="@dimen/padSize"/>
+            <View
+                android:layout_height="@dimen/padSize"
+                android:layout_width="match_parent"/>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:weightSum="5">
+                <EditText
+                    android:id="@+id/topicDataTxt"
+                    android:background="@drawable/border_textview"
+                    android:layout_height="match_parent"
+                    android:layout_width="wrap_content"
+                    android:layout_weight="3"
+                    android:hint="@string/topicHint"
+                    android:textSize="@dimen/textSize"
+                    android:padding="@dimen/padSize"
+                    android:layout_marginVertical="@dimen/padSize"/>
+                <View
+                    android:layout_width="@dimen/padSize"
+                    android:layout_height="match_parent"/>
+
+                <Button
+                    android:layout_marginVertical="@dimen/padSize"
+                    android:padding="@dimen/padSize"
+                    android:id="@+id/sendBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="@string/send"
+                    android:background="@drawable/button"/>
+            </LinearLayout>
+
+
         </LinearLayout>
 
 
+
+
     </LinearLayout>
-
-
-
-
 </LinearLayout>

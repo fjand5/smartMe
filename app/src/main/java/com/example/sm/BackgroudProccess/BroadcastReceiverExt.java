@@ -32,6 +32,7 @@ abstract class BroadcastReceiverExt extends BroadcastReceiver {
     public void startMe(Context context){
         Intent mIntent = new Intent();
         mIntent.setAction(_actionName);
+        mIntent.setFlags(Intent.FLAG_RECEIVER_FOREGROUND);
         context.sendBroadcast(mIntent);
 
 

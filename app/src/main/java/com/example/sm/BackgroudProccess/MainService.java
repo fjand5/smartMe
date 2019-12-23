@@ -41,7 +41,8 @@ public class MainService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         mqttBroadcast.startMe(this);
-        return START_STICKY;
+
+        return START_REDELIVER_INTENT;
     }
 
     public static void beginService(Context context){
@@ -60,6 +61,7 @@ public class MainService extends Service {
         }else{
             Toast.makeText(context,"Dịch vụ đang chạy", LENGTH_LONG).show();
         }
+
     }
     private static boolean isMyServiceRunning(Context context, Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
@@ -70,6 +72,7 @@ public class MainService extends Service {
         }
         return false;
     }
+
 
 
 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background"
+    android:padding="@dimen/padSize"
+
+    android:showDividers="middle|beginning|end"
+    android:divider="@drawable/empty_tall_divider">
+    <Button
+        android:text="Quản Lý IO"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:background="@drawable/button"/>
+
+    <Button
+        android:text="Quản lý cảnh báo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:background="@drawable/button"/>
+</LinearLayout>
