@@ -2,6 +2,7 @@ package com.example.sm.BackgroudProccess;
 
 import android.app.ActivityManager;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -18,18 +19,32 @@ import android.widget.RemoteViews;
 import android.widget.Toast;
 
 
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
+import com.example.sm.R;
+
 import static android.widget.Toast.LENGTH_LONG;
+import static com.example.sm.BackgroudProccess.NotifcationManager.createChannel;
 
 
 public class MainService extends Service {
+    static MainService instance;
     MqttBroadcast mqttBroadcast;
+    NotificationCompat.Builder ntf;
+     RemoteViews rv;
+    int MAIN_ID = 1;
+    public static MainService getInstance(){
 
+        if(instance==null)
+            instance = new MainService();
+        return instance;
+    }
     @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
+
 
 
     @Override
@@ -38,15 +53,17 @@ public class MainService extends Service {
         super.onCreate();
         mqttBroadcast = new MqttBroadcast();
         registerReceiver(new MqttBroadcast(),new IntentFilter(MqttBroadcast.getActionName()));
-
     }
 
 
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         mqttBroadcast.startMe(this);
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            initFore();
+        }
         return START_REDELIVER_INTENT;
     }
 
@@ -78,40 +95,27 @@ public class MainService extends Service {
         return false;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void initFore() {
+
         NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel mainNotifChannelHigh =
-                    new NotificationChannel(MAIN_CHANNEL_ID,
-                            "Dịch vụ chính của ứng dụng",
-                            NotificationManager.IMPORTANCE_HIGH);
-            nm.createNotificationChannel(mainNotifChannelHigh);
-        }
+        nm.createNotificationChannel(new NotificationChannel(
+                MainService.class.getName(),
+                Long.toString(System.currentTimeMillis()),
+                NotificationManager.IMPORTANCE_HIGH)
+        );
 
 
+        ntf = new NotificationCompat.Builder(this,MainService.class.getName());
 
-
-        // create notif compat and notify
-        NotificationCompat.Builder ntf = new NotificationCompat.Builder(this,MAIN_CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_launcher_background)
-                .setChannelId(MAIN_CHANNEL_ID);
-        collapsedView = new RemoteViews(getPackageName(),R.layout.notify_main);
-
-        collapsedView.setOnClickPendingIntent(R.id.btn_on, PendingIntent.getBroadcast(this,
-                0,
-                new Intent(MainNotifyAction.BROADCAST_NAME).putExtra("cmd","on"),
-                0));
-        collapsedView.setOnClickPendingIntent(R.id.btn_off,PendingIntent.getBroadcast(this,
-                1,
-                new Intent(MainNotifyAction.BROADCAST_NAME).putExtra("cmd","off"),
-                0));
-
-        ntf.setCustomContentView(collapsedView);
-
-        startForeground(MAIN_ID_NOTIF, ntf.build());
+        rv= new RemoteViews(getPackageName(),R.layout.notify_layout);
+        ntf.setSmallIcon(R.drawable.ic_launcher_background);
+        ntf.setCustomContentView(rv);
+        rv.setTextViewText(R.id.button,"setText");
+        startForeground(MAIN_ID, ntf.build());
 
 
     }
+
 
 }

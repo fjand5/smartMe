@@ -11,10 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import androidx.annotation.RequiresApi;
 
+import com.example.sm.BackgroudProccess.MainService;
 import com.example.sm.BackgroudProccess.MqttBroadcast;
 import com.example.sm.Presenter.MqttSetting;
 import com.example.sm.R;
@@ -25,6 +27,8 @@ import com.example.sm.view.SettingActivity;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.util.List;
+
+import static android.widget.Toast.LENGTH_LONG;
 
 public class Adapter  extends ArrayAdapter<Item> {
     Context mContext;
@@ -65,7 +69,7 @@ public class Adapter  extends ArrayAdapter<Item> {
                 if(listItem !=null){
                     listItem.add(new Item(message.isRetained(), topic, new String(message.getPayload())));
                     Adapter.instance.notifyDataSetInvalidated();
-
+                    Toast.makeText(mContext,topic, LENGTH_LONG).show();
                 }
 
             }

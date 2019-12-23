@@ -5,8 +5,12 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Build;
 
-import com.example.smartme.R;
+import androidx.annotation.RequiresApi;
+
+import com.example.sm.R;
+
 
 public class NotifcationManager {
     public static void createChannel(Context mContext,
@@ -26,11 +30,12 @@ public class NotifcationManager {
         }
 
     }
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     public  static void callNotify(Context mContext,
-                    int notifyId,
-                    String channelId,
-                    String title,
-                    String text
+                                   int notifyId,
+                                   String channelId,
+                                   String title,
+                                   String text
                     ){
         NotificationManager notificationManager =
                 (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
