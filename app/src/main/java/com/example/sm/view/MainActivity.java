@@ -3,6 +3,7 @@ package com.example.sm.view;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,11 +23,14 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.example.sm.Presenter.MqttConnectManager;
 import com.example.sm.Presenter.MqttSetting;
 import com.example.sm.Presenter.RxDataListView.Adapter;
 import com.example.sm.Presenter.RxDataListView.Item;
 import com.example.sm.R;
 import com.example.sm.BackgroudProccess.MainService;
+
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.util.ArrayList;
 
@@ -52,12 +56,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     MenuFrag menuFrag;
     View menuPos;
     GestureDetector detector;
+
+    MqttConnectManager.Callback callback;
     @Override
     protected void onStart() {
         super.onStart();
             String topic  =  MqttSetting.getInstance().getInfo(this).get("topic").toString();
 
             topicDataTxt.setText(topic);
+    }
+    @Override
+    protected void onPause() {
+        MqttConnectManager.getInstance().removeOnEventMqtt(callback);
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        addEvent();
+        MainService.beginService(this);
+        setStatusView(Adapter.getStatus());
     }
 
     @Override
@@ -67,15 +86,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         detector = new GestureDetector(this,this);
         initView();
-        addEvent();
-        MainService.beginService(this);
-        setStatusView(Adapter.getStatus());
+
     }
 
     private void addEvent() {
         sendBtn.setOnClickListener(this);
         settingImg.setOnClickListener(this);
-        adapter.setOnEventMqtt(new Adapter.Callback() {
+        callback = new MqttConnectManager.Callback() {
             @Override
             public void onDisconnect() {
                 setStatusView(false);
@@ -86,7 +103,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 setStatusView(true);
             }
 
-        });
+            @Override
+            public void onMessageArrived(String topic, MqttMessage message) {
+
+            }
+
+        };
+        MqttConnectManager.getInstance().setOnEventMqtt(callback);
     }
 
     private void initView() {
@@ -173,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void sendData() {
-        Adapter.sendData(topicDataTxt.getText().toString(),txDataTxt.getText().toString());
+        MqttConnectManager.getInstance().sendData(topicDataTxt.getText().toString(),txDataTxt.getText().toString());
     }
 
     private void callSettingActivity() {
@@ -230,12 +253,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
 
-        if(v<0){
+        if(v<0 &&
+                Math.abs(motionEvent.getY() - motionEvent1.getY()) <50){
             hideMenu();
         }
-        if(v>0){
+        if(v>0 &&
+                Math.abs(motionEvent.getY() - motionEvent1.getY()) <50){
             showMenu();
         }
+
+        if(v1>0 &&
+                Math.abs(motionEvent.getX() - motionEvent1.getX()) <50){
+            Adapter.clearData();
+
+        }
+//        Log.d("htl",Float.toString(v1));
         return false;
     }
 }

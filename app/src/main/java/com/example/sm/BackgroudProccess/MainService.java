@@ -25,7 +25,6 @@ import androidx.core.app.NotificationCompat;
 import com.example.sm.R;
 
 import static android.widget.Toast.LENGTH_LONG;
-import static com.example.sm.BackgroudProccess.NotifcationManager.createChannel;
 
 
 public class MainService extends Service {
