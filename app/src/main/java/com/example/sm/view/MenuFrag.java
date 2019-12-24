@@ -1,6 +1,7 @@
 package com.example.sm.view;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,9 +9,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import com.example.sm.R;
+
+import static com.example.sm.Presenter.Utils.Utils.callActivity;
 
 public class MenuFrag extends Fragment {
     Button alarmBtn;
@@ -28,10 +32,9 @@ public class MenuFrag extends Fragment {
         return v;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     private void callAlarmActivity() {
-
-            Intent i = new Intent(getActivity(), AlarmActivity.class);
-            startActivity(i);
+        callActivity(getActivity(),AlarmActivity.class);
 
     }
 }

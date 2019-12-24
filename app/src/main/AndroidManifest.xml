@@ -25,6 +25,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".view.RingActivity"/>
         <activity android:name=".view.AlarmActivity"/>
         <activity android:name=".view.DetailMessageActivity"/>
         <activity android:name=".view.SettingActivity"/>

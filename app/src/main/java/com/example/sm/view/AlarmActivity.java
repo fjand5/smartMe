@@ -1,6 +1,10 @@
 package com.example.sm.view;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.JsonReader;
 import android.util.Log;
@@ -10,12 +14,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
+
 import com.example.sm.Presenter.MqttConnectManager;
 import com.example.sm.R;
 
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import static com.example.sm.Presenter.Utils.Utils.callActivity;
 
 
 public class AlarmActivity extends Activity {
@@ -65,6 +73,7 @@ public class AlarmActivity extends Activity {
 
             }
 
+            @RequiresApi(api = Build.VERSION_CODES.Q)
             @Override
             public void onMessageArrived(String topic, MqttMessage message) {
 
@@ -78,6 +87,7 @@ public class AlarmActivity extends Activity {
                         String tmp = new JSONObject().put("cmd","UAL")
                                 .put("time",30000).toString();
                         MqttConnectManager.sendData("luat/espAL/rx",tmp);
+                        callRingActiity();
 
                     }
                     if(jsonObject.has("cmd")
@@ -156,5 +166,10 @@ public class AlarmActivity extends Activity {
         curDeltaTxt =  findViewById(R.id.curDeltaTxt);
         desDeltaTxt = findViewById(R.id.desDeltaTxt);
         setDeltaBtn = findViewById(R.id.setDeltaBtn);
+    }
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    private void callRingActiity() {
+        callActivity(this,RingActivity.class);
+
     }
 }
