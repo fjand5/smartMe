@@ -28,6 +28,7 @@ import static android.widget.Toast.LENGTH_LONG;
 
 
 public class MainService extends Service {
+    static boolean isRunning = true;
     static MainService instance;
     MqttBroadcast mqttBroadcast;
     NotificationCompat.Builder ntf;
@@ -94,27 +95,44 @@ public class MainService extends Service {
         return false;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+
     private void initFore() {
 
         NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        nm.createNotificationChannel(new NotificationChannel(
-                MainService.class.getName(),
-                Long.toString(System.currentTimeMillis()),
-                NotificationManager.IMPORTANCE_HIGH)
-        );
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            nm.createNotificationChannel(new NotificationChannel(
+                    MainService.class.getName(),
+                    Long.toString(System.currentTimeMillis()),
+                    NotificationManager.IMPORTANCE_HIGH)
+            );
+        }
 
 
         ntf = new NotificationCompat.Builder(this,MainService.class.getName());
 
-        rv= new RemoteViews(getPackageName(),R.layout.notify_layout);
+
         ntf.setSmallIcon(R.drawable.ic_launcher_background);
+
+        rv= new RemoteViews(getPackageName(),R.layout.notify_layout);
+
         ntf.setCustomContentView(rv);
-        rv.setTextViewText(R.id.button,"setText");
+        rv.setTextViewText(R.id.mainBtn,"Đang chạy");
         startForeground(MAIN_ID, ntf.build());
 
-
     }
-
+    void pause(){
+        isRunning = false;
+        rv= new RemoteViews(getPackageName(),R.layout.notify_layout);
+        ntf.setCustomContentView(rv);
+        rv.setTextViewText(R.id.mainBtn,"Đang dừng");
+        startForeground(MAIN_ID, ntf.build());
+    }
+    void resume(){
+        isRunning = true;
+        rv= new RemoteViews(getPackageName(),R.layout.notify_layout);
+        ntf.setCustomContentView(rv);
+        rv.setTextViewText(R.id.mainBtn,"Đang chạy");
+        startForeground(MAIN_ID, ntf.build());
+    }
 
 }

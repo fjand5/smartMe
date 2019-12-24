@@ -23,6 +23,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.example.sm.InitSystem;
 import com.example.sm.Presenter.MqttConnectManager;
 import com.example.sm.Presenter.MqttSetting;
 import com.example.sm.Presenter.RxDataListView.Adapter;
@@ -86,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         detector = new GestureDetector(this,this);
         initView();
+        InitSystem.getInstancs(this);
 
     }
 

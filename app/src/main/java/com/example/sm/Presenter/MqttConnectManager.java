@@ -10,14 +10,10 @@ import com.example.sm.Presenter.RxDataListView.Item;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import static android.widget.Toast.LENGTH_LONG;
 
 public class MqttConnectManager {
     static MqttConnectManager instance;
     private ArrayList<Callback> onEventMqttList;
-    private Callback e;
 
     private MqttConnectManager() {
         MqttBroadcast.setOnConnectStatusChange(new MqttBroadcast.OnConnectStatusChange() {
@@ -40,6 +36,8 @@ public class MqttConnectManager {
             }
             @Override
             public void messageArrived(String topic, MqttMessage message) {
+                if(message.isRetained())
+                    return;
                 for (Callback onEventMqtt:
                         onEventMqttList) {
                     if (onEventMqtt != null)

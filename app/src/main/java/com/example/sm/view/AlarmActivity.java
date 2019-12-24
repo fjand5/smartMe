@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 
+import com.example.sm.InitSystem;
 import com.example.sm.Presenter.MqttConnectManager;
 import com.example.sm.R;
 
@@ -29,22 +30,13 @@ import static com.example.sm.Presenter.Utils.Utils.callActivity;
 public class AlarmActivity extends Activity {
     TextView curDeltaTxt;
     EditText desDeltaTxt;
-    Button setDeltaBtn;
+    Button setDeltaBtn,calibBtn;
 
-    Thread thread;
-    volatile boolean stop = false;
     MqttConnectManager.Callback callback;
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if ((keyCode == KeyEvent.KEYCODE_BACK))
-        {
-            stop=true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
 
     @Override
     protected void onPause() {
+        InitSystem.setSendSignalFlag(false);
         MqttConnectManager.getInstance().removeOnEventMqtt(callback);
         super.onPause();
     }
@@ -60,8 +52,7 @@ public class AlarmActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-
-        setThread();
+        InitSystem.setSendSignalFlag(true);
         callback = new MqttConnectManager.Callback() {
             @Override
             public void onDisconnect() {
@@ -76,20 +67,11 @@ public class AlarmActivity extends Activity {
             @RequiresApi(api = Build.VERSION_CODES.Q)
             @Override
             public void onMessageArrived(String topic, MqttMessage message) {
-
                 String content = new String(message.getPayload());
+                Log.d("htl",content);
+
                 try {
                     JSONObject jsonObject  =new JSONObject(content);
-                    if(jsonObject.has("cmd")
-                            && jsonObject.get("cmd").equals("ALR")){
-                        // onAlarm
-
-                        String tmp = new JSONObject().put("cmd","UAL")
-                                .put("time",30000).toString();
-                        MqttConnectManager.sendData("luat/espAL/rx",tmp);
-                        callRingActiity();
-
-                    }
                     if(jsonObject.has("cmd")
                             && jsonObject.get("cmd").equals("GDT")){
                         float val = jsonObject.getInt("val");
@@ -105,33 +87,10 @@ public class AlarmActivity extends Activity {
         addEvent();
     }
 
-    private void setThread() {
-        stop = false;
-        thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while(!stop){
-                    String tmp = null;
-                    try {
-                        tmp = new JSONObject().put("cmd","GDT").toString();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    MqttConnectManager.sendData("luat/espAL/rx",tmp);
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
 
-            }
-        });
-        thread.start();
-    }
 
     private void addEvent() {
-        curDeltaTxt.setOnClickListener(new View.OnClickListener() {
+        calibBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -166,10 +125,7 @@ public class AlarmActivity extends Activity {
         curDeltaTxt =  findViewById(R.id.curDeltaTxt);
         desDeltaTxt = findViewById(R.id.desDeltaTxt);
         setDeltaBtn = findViewById(R.id.setDeltaBtn);
+        calibBtn = findViewById(R.id.calibBtn);
     }
-    @RequiresApi(api = Build.VERSION_CODES.Q)
-    private void callRingActiity() {
-        callActivity(this,RingActivity.class);
 
-    }
 }

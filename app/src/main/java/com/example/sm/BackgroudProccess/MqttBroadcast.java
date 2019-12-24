@@ -160,7 +160,7 @@ public class MqttBroadcast extends BroadcastReceiverExt {
     }
     static public void publish(String topic, String content, boolean retain){
         try {
-            client.publish(topic ,content.getBytes(),0,false);
+            client.publish(topic ,content.getBytes(),1,false);
         } catch (MqttException e) {
             e.printStackTrace();
         }
