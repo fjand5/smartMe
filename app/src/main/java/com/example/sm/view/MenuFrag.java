@@ -17,16 +17,25 @@ import com.example.sm.R;
 import static com.example.sm.Presenter.Utils.Utils.callActivity;
 
 public class MenuFrag extends Fragment {
-    Button alarmBtn;
+    Button alarmBtn,ioManagerBtn;
     public View onCreateView(LayoutInflater inflater,ViewGroup container, Bundle savedInstanceState) {
         View v;
         v = inflater.inflate(R.layout.frag_menu,container,false);
 
         alarmBtn = v.findViewById(R.id.alarmBtn);
+        ioManagerBtn = v.findViewById(R.id.ioManagerBtn);
         alarmBtn.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.Q)
             @Override
             public void onClick(View view) {
                callAlarmActivity();
+            }
+        });
+        ioManagerBtn.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.Q)
+            @Override
+            public void onClick(View view) {
+                callIoManagerActivity();
             }
         });
         return v;
@@ -35,6 +44,12 @@ public class MenuFrag extends Fragment {
     @RequiresApi(api = Build.VERSION_CODES.Q)
     private void callAlarmActivity() {
         callActivity(getActivity(),AlarmActivity.class);
+
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    private void callIoManagerActivity() {
+        callActivity(getActivity(),IoManagerActivity.class);
 
     }
 }

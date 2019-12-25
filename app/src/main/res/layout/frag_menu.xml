@@ -9,7 +9,7 @@
     android:showDividers="middle|beginning|end"
     android:divider="@drawable/empty_tall_divider">
     <Button
-
+        android:id="@+id/ioManagerBtn"
         android:text="Quản Lý IO"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -8,8 +8,8 @@ import com.example.sm.view.SettingActivity;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 
-public class MqttInfo implements  IMqttInfo{
-    SharedPreferences MqttInfoData;
+public class MqttInfo{
+
     static MqttInfo instance;
     private MqttInfo(){};
     public static MqttInfo getInstance(){
@@ -19,7 +19,7 @@ public class MqttInfo implements  IMqttInfo{
         return instance;
     };
 
-    @Override
+
     public String getAddress(Context context) {
 
         if(instance == null)
@@ -28,7 +28,7 @@ public class MqttInfo implements  IMqttInfo{
             return getSharedPreferences(context).getString("address","");
     }
 
-    @Override
+
     public int getPort(Context context) {
         if(instance == null)
             return 0;
@@ -36,7 +36,7 @@ public class MqttInfo implements  IMqttInfo{
             return getSharedPreferences(context).getInt("port",0);
     }
 
-    @Override
+
     public String getUsername(Context context) {
         if(instance == null)
             return "";
@@ -44,7 +44,7 @@ public class MqttInfo implements  IMqttInfo{
             return getSharedPreferences(context).getString("username","");
     }
 
-    @Override
+
     public String getPassword(Context context) {
         if(instance == null)
             return "";
@@ -52,14 +52,14 @@ public class MqttInfo implements  IMqttInfo{
             return getSharedPreferences(context).getString("password","");
     }
 
-    @Override
+
     public String getTopic(Context context) {
         if(instance == null)
             return "";
         return getSharedPreferences(context).getString("topic","");
     }
 
-    @Override
+
     public void setInfo(Context context, String addr, int port, String name, String pass, String topic) {
 
             SharedPreferences.Editor editor = getSharedPreferences(context).edit();
