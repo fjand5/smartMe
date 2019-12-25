@@ -16,6 +16,8 @@ import org.json.JSONObject;
 import static com.example.sm.Presenter.Utils.Utils.callActivity;
 
 public class InitSystem {
+    static boolean LISTEN_MESSAGE = true;
+
     static Thread thread;
     static InitSystem instancs;
 

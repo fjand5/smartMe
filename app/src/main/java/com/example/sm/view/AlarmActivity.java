@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.JsonReader;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -29,11 +30,12 @@ import static com.example.sm.Presenter.Utils.Utils.callActivity;
 
 public class AlarmActivity extends Activity {
     TextView curDeltaTxt;
+    TextView statusResTxt;
     EditText desDeltaTxt;
     Button setDeltaBtn,calibBtn;
 
     MqttConnectManager.Callback callback;
-
+    CountDownTimer countDownTimer;
     @Override
     protected void onPause() {
         InitSystem.setSendSignalFlag(false);
@@ -46,13 +48,27 @@ public class AlarmActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm_manager);
         initView();
+        countDownTimer = new CountDownTimer(5000,5000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+
+            }
+
+            @Override
+            public void onFinish() {
+                statusResTxt.setText("Mất kết nối với thiết bị");
+            }
+
+        };
 
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
         InitSystem.setSendSignalFlag(true);
+        countDownTimer.start();
         callback = new MqttConnectManager.Callback() {
             @Override
             public void onDisconnect() {
@@ -67,6 +83,9 @@ public class AlarmActivity extends Activity {
             @RequiresApi(api = Build.VERSION_CODES.Q)
             @Override
             public void onMessageArrived(String topic, MqttMessage message) {
+                countDownTimer.cancel();
+                statusResTxt.setText("Đang kết nối");
+                countDownTimer.start();
                 String content = new String(message.getPayload());
                 Log.d("htl",content);
 
@@ -124,6 +143,7 @@ public class AlarmActivity extends Activity {
     private void initView() {
         curDeltaTxt =  findViewById(R.id.curDeltaTxt);
         desDeltaTxt = findViewById(R.id.desDeltaTxt);
+        statusResTxt = findViewById(R.id.statusResTxt);
         setDeltaBtn = findViewById(R.id.setDeltaBtn);
         calibBtn = findViewById(R.id.calibBtn);
     }

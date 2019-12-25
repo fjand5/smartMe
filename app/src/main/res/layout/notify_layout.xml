@@ -1,5 +1,27 @@
-<Button android:id="@+id/mainBtn"
-    android:layout_width="wrap_content"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="wrap_content"
-    android:text="chua co"
-    xmlns:android="http://schemas.android.com/apk/res/android" />
+    android:layout_width="match_parent"
+    android:gravity="center"
+    android:padding="@dimen/padSize"
+    android:weightSum="2"
+>
+    <Button
+        android:id="@+id/pauseBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Dừng"
+        android:background="@drawable/button"
+        android:layout_weight="1"
+       />
+    <Button
+        android:id="@+id/resumeBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Tiếp Tục"
+        android:background="@drawable/button"
+        android:layout_weight="1"
+        />
+
+
+</LinearLayout>

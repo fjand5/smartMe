@@ -14,6 +14,15 @@ import java.util.ArrayList;
 public class MqttConnectManager {
     static MqttConnectManager instance;
     private ArrayList<Callback> onEventMqttList;
+    boolean isRunning = true;
+
+    public boolean isRunning() {
+        return isRunning;
+    }
+
+    public void setRunning(boolean running) {
+        isRunning = running;
+    }
 
     private MqttConnectManager() {
         MqttBroadcast.setOnConnectStatusChange(new MqttBroadcast.OnConnectStatusChange() {
@@ -36,6 +45,9 @@ public class MqttConnectManager {
             }
             @Override
             public void messageArrived(String topic, MqttMessage message) {
+                if(!isRunning())
+                    return;
+                    
                 if(message.isRetained())
                     return;
                 for (Callback onEventMqtt:
@@ -64,11 +76,11 @@ public class MqttConnectManager {
     public void removeOnEventMqtt(Callback onEventMqtt) {
         if(onEventMqttList == null)
             return;
-//        for (Callback e:
-//                onEventMqttList) {
-//            if (e.toString().equals(onEventMqtt.toString()))
-//                onEventMqttList.remove(e);
-//        }
+        for (Callback e:
+                onEventMqttList) {
+            if (e.toString().equals(onEventMqtt.toString()))
+                onEventMqttList.remove(e);
+        }
 
 
     }

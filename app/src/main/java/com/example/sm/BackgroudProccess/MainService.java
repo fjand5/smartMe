@@ -2,7 +2,6 @@ package com.example.sm.BackgroudProccess;
 
 import android.app.ActivityManager;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -15,6 +14,7 @@ import android.os.Build;
 
 import android.os.IBinder;
 
+import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
@@ -28,12 +28,14 @@ import static android.widget.Toast.LENGTH_LONG;
 
 
 public class MainService extends Service {
-    static boolean isRunning = true;
+
     static MainService instance;
     MqttBroadcast mqttBroadcast;
     NotificationCompat.Builder ntf;
-     RemoteViews rv;
+    NotificationManager nm;
+    static RemoteViews rv;
     int MAIN_ID = 1;
+    String name;
     public static MainService getInstance(){
 
         if(instance==null)
@@ -49,7 +51,7 @@ public class MainService extends Service {
 
     @Override
     public void onCreate() {
-
+        name = getPackageName();
         super.onCreate();
         mqttBroadcast = new MqttBroadcast();
         registerReceiver(new MqttBroadcast(),new IntentFilter(MqttBroadcast.getActionName()));
@@ -98,7 +100,7 @@ public class MainService extends Service {
 
     private void initFore() {
 
-        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             nm.createNotificationChannel(new NotificationChannel(
                     MainService.class.getName(),
@@ -111,28 +113,25 @@ public class MainService extends Service {
         ntf = new NotificationCompat.Builder(this,MainService.class.getName());
 
 
-        ntf.setSmallIcon(R.drawable.ic_launcher_background);
+        ntf.setSmallIcon(R.drawable.icon);
 
         rv= new RemoteViews(getPackageName(),R.layout.notify_layout);
 
+        Intent i = new Intent(this, HandleNotifyService.class);
+        i.putExtra("state",false);
+        rv.setOnClickPendingIntent(R.id.pauseBtn,
+                PendingIntent.getService(this,0,i,PendingIntent.FLAG_CANCEL_CURRENT));
+
+
+        i = new Intent(this, HandleNotifyService.class);
+        i.putExtra("state",true);
+        rv.setOnClickPendingIntent(R.id.resumeBtn,
+                PendingIntent.getService(this,0,i,PendingIntent.FLAG_CANCEL_CURRENT));
         ntf.setCustomContentView(rv);
-        rv.setTextViewText(R.id.mainBtn,"Đang chạy");
+
+
         startForeground(MAIN_ID, ntf.build());
 
-    }
-    void pause(){
-        isRunning = false;
-        rv= new RemoteViews(getPackageName(),R.layout.notify_layout);
-        ntf.setCustomContentView(rv);
-        rv.setTextViewText(R.id.mainBtn,"Đang dừng");
-        startForeground(MAIN_ID, ntf.build());
-    }
-    void resume(){
-        isRunning = true;
-        rv= new RemoteViews(getPackageName(),R.layout.notify_layout);
-        ntf.setCustomContentView(rv);
-        rv.setTextViewText(R.id.mainBtn,"Đang chạy");
-        startForeground(MAIN_ID, ntf.build());
     }
 
 }
