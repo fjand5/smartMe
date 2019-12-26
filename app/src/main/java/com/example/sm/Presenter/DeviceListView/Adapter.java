@@ -34,21 +34,25 @@ public class Adapter extends ArrayAdapter<Item> {
         if(instance == null){
             instance = new Adapter(context,resource,objects);
         }
+        instance.syncDevice();
+        return instance;
+    }
+    static public Adapter getInstance(){
         return instance;
     }
     public Adapter(Context context, int resource, List<Item> objects) {
         super(context, resource, objects);
         mContext = context;
         listItem = objects;
-        addDevice("Bảng Hiệu","luat/esp/rx",
-                "{\"cmd\":\"SEP\",\"pin\":\"D2\",\"state\":\"LOW\"}",
-                "{\"cmd\":\"SEP\",\"pin\":\"D2\",\"state\":\"HIGH\"}");
-addDevice("Đèn Sao Băng","luat/esp/rx",
-                "{\"cmd\":\"SEP\",\"pin\":\"D0\",\"state\":\"LOW\"}",
-                "{\"cmd\":\"SEP\",\"pin\":\"D0\",\"state\":\"HIGH\"}");
-addDevice("Đèn Đỏ","luat/esp/rx",
-                "{\"cmd\":\"SEP\",\"pin\":\"D1\",\"state\":\"LOW\"}",
-                "{\"cmd\":\"SEP\",\"pin\":\"D1\",\"state\":\"HIGH\"}");
+//        addDevice("Bảng Hiệu","luat/esp/rx",
+//                "{\"cmd\":\"SEP\",\"pin\":\"D2\",\"state\":\"LOW\"}",
+//                "{\"cmd\":\"SEP\",\"pin\":\"D2\",\"state\":\"HIGH\"}");
+//addDevice("Đèn Sao Băng","luat/esp/rx",
+//                "{\"cmd\":\"SEP\",\"pin\":\"D0\",\"state\":\"LOW\"}",
+//                "{\"cmd\":\"SEP\",\"pin\":\"D0\",\"state\":\"HIGH\"}");
+//addDevice("Đèn Đỏ","luat/esp/rx",
+//                "{\"cmd\":\"SEP\",\"pin\":\"D1\",\"state\":\"LOW\"}",
+//                "{\"cmd\":\"SEP\",\"pin\":\"D1\",\"state\":\"HIGH\"}");
 
 
     }
@@ -90,7 +94,7 @@ addDevice("Đèn Đỏ","luat/esp/rx",
         return v;
     }
 
-    void addDevice(String name,String topic, String cmdOn, String cmdOff){
+    public void addDevice(String name, String topic, String cmdOn, String cmdOff){
         ListDeviceInfo.getInstance().addDevice(mContext,
                 name,
                 topic,

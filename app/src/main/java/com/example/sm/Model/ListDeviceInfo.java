@@ -37,7 +37,7 @@ public class ListDeviceInfo{
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        Log.d("htl",jsonObject.toString());
+
         tmp.add(jsonObject.toString());
         setListDevice(context,tmp);
     }
@@ -66,9 +66,11 @@ public class ListDeviceInfo{
     void setListDevice(Context context, Set<String> setString){
         getSharedPreferences(context)
                 .edit()
+                .remove("ListDevice")
                 .putStringSet("ListDevice",
                         setString)
         .commit();
+
     }
     public void clearDevice(Context context){
         setListDevice(context,null);

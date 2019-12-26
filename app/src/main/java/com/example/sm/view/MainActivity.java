@@ -1,8 +1,10 @@
 package com.example.sm.view;
 
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Layout;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -58,27 +60,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     View menuPos;
     GestureDetector detector;
 
+    View consoleLyt;
+
     MqttConnectManager.Callback callback;
-    @Override
-    protected void onStart() {
-        super.onStart();
-            String topic  =  MqttSetting.getInstance().getInfo(this).get("topic").toString();
-
-            topicDataTxt.setText(topic);
-    }
-    @Override
-    protected void onPause() {
-        MqttConnectManager.getInstance().removeOnEventMqtt(callback);
-        super.onPause();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        addEvent();
-        MainService.beginService(this);
-        setStatusView(Adapter.getStatus());
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +74,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         InitSystem.getInstancs(this);
 
     }
+    @Override
+    protected void onPause() {
+        MqttConnectManager.getInstance().removeOnEventMqtt(callback);
+        super.onPause();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+            String topic  =  MqttSetting.getInstance().getInfo(this).get("topic").toString();
+
+            topicDataTxt.setText(topic);
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        addEvent();
+        MainService.beginService(this);
+        setStatusView(Adapter.getStatus());
+    }
+
 
     private void addEvent() {
         sendBtn.setOnClickListener(this);
@@ -114,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         MqttConnectManager.getInstance().setOnEventMqtt(callback);
     }
 
+    @SuppressLint("WrongViewCast")
     private void initView() {
         getSupportActionBar().hide();
         menuFrag = new MenuFrag();
@@ -137,6 +143,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         sendBtn = findViewById(R.id.sendBtn);
 
         menuPos = findViewById(R.id.fragMenuPos);
+
+        consoleLyt = findViewById(R.id.consoleLyt);
 
 
     }
@@ -179,6 +187,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         });
+
+
+    }private void showConsole() {
+        if(consoleLyt.getVisibility() == View.VISIBLE)
+            return;
+        consoleLyt.setVisibility(View.VISIBLE);
+        Animation animation = AnimationUtils.loadAnimation(this, R.anim.show_console);
+        consoleLyt.startAnimation(animation);
+
+
+
+    }
+    private void hideConsole() {
+
+        if(consoleLyt.getVisibility() == View.INVISIBLE)
+            return;
+        consoleLyt.setVisibility(View.INVISIBLE);
+        Animation animation = AnimationUtils.loadAnimation(this, R.anim.hide_console);
+        consoleLyt.startAnimation(animation);
 
 
     }
@@ -256,20 +283,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
 
         if(v<0 &&
-                Math.abs(motionEvent.getY() - motionEvent1.getY()) <50){
+                Math.abs(motionEvent.getY() - motionEvent1.getY()) <100){
             hideMenu();
+            return false;
+
+
         }
         if(v>0 &&
-                Math.abs(motionEvent.getY() - motionEvent1.getY()) <50){
+                Math.abs(motionEvent.getY() - motionEvent1.getY()) <100){
             showMenu();
+            return false;
+
         }
 
         if(v1>0 &&
-                Math.abs(motionEvent.getX() - motionEvent1.getX()) <50){
-            Adapter.clearData();
+                Math.abs(motionEvent.getX() - motionEvent1.getX()) <100){
+
+            showConsole();
+            return false;
+
 
         }
-//        Log.d("htl",Float.toString(v1));
+        if(v1<0 &&
+                Math.abs(motionEvent.getX() - motionEvent1.getX()) <100){
+            Adapter.clearData();
+            hideConsole();
+            return false;
+
+        }
         return false;
+
+
     }
 }

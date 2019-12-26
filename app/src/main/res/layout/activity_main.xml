@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:id="@+id/taolao">
 
     <LinearLayout
         android:id="@+id/fragMenuPos"
@@ -76,11 +77,13 @@
         </RelativeLayout>
 
         <LinearLayout
+            android:id="@+id/consoleLyt"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:weightSum="5"
-            android:padding="@dimen/padSize">
+            android:padding="@dimen/padSize"
+            android:visibility="invisible">
 
             <ListView
                 android:id="@+id/rxDataLsv"

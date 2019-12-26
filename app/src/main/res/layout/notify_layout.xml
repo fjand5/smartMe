@@ -9,17 +9,15 @@
     <Button
         android:id="@+id/pauseBtn"
         android:layout_width="0dp"
-        android:layout_height="30dp"
+        android:layout_height="wrap_content"
         android:text="Dừng"
-        android:background="@drawable/button"
         android:layout_weight="1"
        />
     <Button
         android:id="@+id/resumeBtn"
         android:layout_width="0dp"
-        android:layout_height="30dp"
+        android:layout_height="wrap_content"
         android:text="Tiếp Tục"
-        android:background="@drawable/button"
         android:layout_weight="1"
         />
 

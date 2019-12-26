@@ -15,11 +15,8 @@ import android.widget.Toast;
 
 import com.example.sm.Presenter.MqttSetting;
 import com.example.sm.R;
-import com.example.sm.BackgroudProccess.MqttBroadcast;
+import com.google.android.material.snackbar.Snackbar;
 
-import org.eclipse.paho.client.mqttv3.MqttException;
-
-import java.util.ArrayList;
 import java.util.Dictionary;
 
 
@@ -130,12 +127,10 @@ public class SettingActivity extends Activity implements TextWatcher, View.OnCli
         switch(view.getId()){
             case R.id.saveBtn:
                 saveInfo();
-                Toast.makeText(this, getResources().getString(R.string.saved),Toast.LENGTH_LONG).show();
                 finish();
                 break;
             case R.id.exitBtn:
-                finish();
-                Toast.makeText(this,getResources().getString(R.string.notSave),Toast.LENGTH_SHORT).show();
+               finish();
             break;
         }
 
