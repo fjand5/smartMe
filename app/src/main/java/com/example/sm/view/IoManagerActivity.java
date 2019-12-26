@@ -15,6 +15,7 @@ import android.widget.ListView;
 
 import androidx.annotation.Nullable;
 
+import com.example.sm.Model.ListDeviceInfo;
 import com.example.sm.Presenter.DeviceListView.Adapter;
 import com.example.sm.Presenter.DeviceListView.Item;
 import com.example.sm.R;
@@ -77,6 +78,8 @@ public class IoManagerActivity extends Activity{
 
             }
         });
+
+        Log.d("htl",ListDeviceInfo.getInstance().getListDevice(this).toString());
         dialog.show();
     }
 

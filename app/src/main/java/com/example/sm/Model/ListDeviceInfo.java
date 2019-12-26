@@ -2,10 +2,16 @@ package com.example.sm.Model;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
+import android.util.JsonReader;
 import android.util.Log;
 
+import androidx.annotation.RequiresApi;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -27,7 +33,7 @@ public class ListDeviceInfo{
     };
 
     public void addDevice(Context context, String name,String topic, String cmdOn, String cmdOff){
-        Set<String> tmp = getListDevice(context);
+        JSONArray tmp = getListDevice(context);
         JSONObject jsonObject  = new JSONObject();
         try {
             jsonObject.put("name",name);
@@ -38,19 +44,19 @@ public class ListDeviceInfo{
             e.printStackTrace();
         }
 
-        tmp.add(jsonObject.toString());
+        tmp.put(jsonObject);
         setListDevice(context,tmp);
     }
-    public void removeDevice(Context context,String name){
-        Set<String> tmp = getListDevice(context);
-        for (String e:
-                tmp) {
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public void removeDevice(Context context, String name){
+        JSONArray jsonArray  = getListDevice(context);
+        for (int i =0;i<jsonArray.length();i++) {
             try {
-                JSONObject jsonObject  =new JSONObject(e);
+                JSONObject jsonObject  = jsonArray.getJSONObject(i);
                 if(jsonObject.has("name")
                         && jsonObject.get("name").equals(name)){
-                    tmp.remove(e);
-                    setListDevice(context,tmp);
+                    jsonArray.remove(i);
+                    setListDevice(context,jsonArray);
                     return;
                 }
 
@@ -58,18 +64,43 @@ public class ListDeviceInfo{
                 er.printStackTrace();
             }
         }
-    }
-    public Set<String> getListDevice(Context context){
 
-        return getSharedPreferences(context).getStringSet("ListDevice",new TreeSet<String>());
     }
-    void setListDevice(Context context, Set<String> setString){
+    public boolean isValidJsonArray(String jsonStr) {
+        Object json = null;
+        try {
+            json = new JSONTokener(jsonStr).nextValue();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if (json instanceof JSONArray) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    public JSONArray getListDevice(Context context){
+        JSONArray ret= null;
+        String data = getSharedPreferences(context).getString(ListDeviceInfo.class.getName(),"");
+        if(isValidJsonArray(data)){
+            try {
+                ret = new JSONArray(data);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }else{
+            ret = new JSONArray();
+        }
+
+        return ret;
+    }
+    void setListDevice(Context context, JSONArray jsonArray){
         getSharedPreferences(context)
                 .edit()
-                .remove("ListDevice")
-                .putStringSet("ListDevice",
-                        setString)
-        .commit();
+                .remove(ListDeviceInfo.class.getName())
+                .putString(ListDeviceInfo.class.getName(),
+                        jsonArray.toString())
+        .apply();
 
     }
     public void clearDevice(Context context){

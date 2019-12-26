@@ -2,7 +2,10 @@ package com.example.sm.Presenter.DeviceListView;
 
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,6 +22,7 @@ import com.example.sm.Presenter.MqttConnectManager;
 import com.example.sm.R;
 
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -44,17 +48,6 @@ public class Adapter extends ArrayAdapter<Item> {
         super(context, resource, objects);
         mContext = context;
         listItem = objects;
-//        addDevice("Bảng Hiệu","luat/esp/rx",
-//                "{\"cmd\":\"SEP\",\"pin\":\"D2\",\"state\":\"LOW\"}",
-//                "{\"cmd\":\"SEP\",\"pin\":\"D2\",\"state\":\"HIGH\"}");
-//addDevice("Đèn Sao Băng","luat/esp/rx",
-//                "{\"cmd\":\"SEP\",\"pin\":\"D0\",\"state\":\"LOW\"}",
-//                "{\"cmd\":\"SEP\",\"pin\":\"D0\",\"state\":\"HIGH\"}");
-//addDevice("Đèn Đỏ","luat/esp/rx",
-//                "{\"cmd\":\"SEP\",\"pin\":\"D1\",\"state\":\"LOW\"}",
-//                "{\"cmd\":\"SEP\",\"pin\":\"D1\",\"state\":\"HIGH\"}");
-
-
     }
 
 
@@ -70,7 +63,7 @@ public class Adapter extends ArrayAdapter<Item> {
         }
         Button onDevideBtn = v.findViewById(R.id.onDevideBtn);
         Button offDevideBtn = v.findViewById(R.id.offDevideBtn);
-        TextView nameDeviceTxt = v.findViewById(R.id.nameDeviceTxt);
+        final TextView nameDeviceTxt = v.findViewById(R.id.nameDeviceTxt);
         nameDeviceTxt.setText(listItem.get(position).getName());
         onDevideBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,7 +83,33 @@ public class Adapter extends ArrayAdapter<Item> {
                             listItem.get(position).getCmdOff());
             }
         });
+        nameDeviceTxt.setOnLongClickListener(new View.OnLongClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public boolean onLongClick(View view) {
+                AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
+                dialog.setTitle("Xác nhận !")
+                        .setMessage("Bạn có muốn xóa thiết bị này không ?")
+                        .setIcon(R.drawable.icon)
+                        .setNegativeButton("Không", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
 
+                            }
+                        })
+                        .setPositiveButton("Có", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Adapter.getInstance().removeDevice(nameDeviceTxt.getText().toString());
+                                syncDevice();
+                            }
+                        });
+                dialog.create();
+                dialog.show();
+
+                return false;
+            }
+        });
         return v;
     }
 
@@ -102,13 +121,16 @@ public class Adapter extends ArrayAdapter<Item> {
                 cmdOff);
         syncDevice();
     }
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public void removeDevice(String name){
+        ListDeviceInfo.getInstance().removeDevice(mContext,name);
+    }
     void syncDevice(){
-        Set<String> tmp = ListDeviceInfo.getInstance().getListDevice(mContext);
+        JSONArray tmp = ListDeviceInfo.getInstance().getListDevice(mContext);
         listItem.clear();
-        for (String elm:
-             tmp) {
+        for (int i = 0; i<tmp.length();i++) {
             try {
-                JSONObject jsonObject  =new JSONObject(elm);
+                JSONObject jsonObject  = tmp.getJSONObject(i);
                 listItem.add(new Item(
                         jsonObject.getString("name"),
                         jsonObject.getString("topic"),
