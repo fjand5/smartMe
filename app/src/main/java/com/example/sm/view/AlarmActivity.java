@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.media.Ringtone;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -31,6 +32,7 @@ import static com.example.sm.Presenter.Utils.Utils.callActivity;
 public class AlarmActivity extends Activity {
     TextView curDeltaTxt;
     TextView statusResTxt;
+    TextView curThresholdTxt;
     EditText desDeltaTxt;
     Button setDeltaBtn,calibBtn;
 
@@ -66,7 +68,7 @@ public class AlarmActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-
+        MqttConnectManager.sendData("luat/espAL/rx","{\"cmd\":\"GOJ\",\"obj\":\"\"}");
         InitSystem.setSendSignalFlag(true);
         countDownTimer.start();
         callback = new MqttConnectManager.Callback() {
@@ -96,9 +98,15 @@ public class AlarmActivity extends Activity {
                         float val = jsonObject.getInt("val");
                         curDeltaTxt.setText(String.valueOf(val));
 
+                    } if(jsonObject.has("MPU")){
+                        JSONObject mpuObj = jsonObject.getJSONObject("MPU");
+                        float val = mpuObj.getInt("delta");
+                        curThresholdTxt.setText(String.valueOf(val));
                     }
 
-                } catch (JSONException e) {
+
+
+                    }catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
@@ -120,6 +128,7 @@ public class AlarmActivity extends Activity {
                         e.printStackTrace();
                     }
                     MqttConnectManager.sendData("luat/espAL/rx",tmp);
+                RingActivity.ringtone.stop();
 
 
             }
@@ -135,6 +144,20 @@ public class AlarmActivity extends Activity {
                     e.printStackTrace();
                 }
                 MqttConnectManager.sendData("luat/espAL/rx",tmp);
+
+                new CountDownTimer(100,100){
+
+                    @Override
+                    public void onTick(long l) {
+
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        MqttConnectManager.sendData("luat/espAL/rx","{\"cmd\":\"GOJ\",\"obj\":\"\"}");
+
+                    }
+                }.start();
             }
         });
         MqttConnectManager.getInstance().setOnEventMqtt(callback);
@@ -142,6 +165,7 @@ public class AlarmActivity extends Activity {
 
     private void initView() {
         curDeltaTxt =  findViewById(R.id.curDeltaTxt);
+        curThresholdTxt =  findViewById(R.id.curThresholdTxt);
         desDeltaTxt = findViewById(R.id.desDeltaTxt);
         statusResTxt = findViewById(R.id.statusResTxt);
         setDeltaBtn = findViewById(R.id.setDeltaBtn);

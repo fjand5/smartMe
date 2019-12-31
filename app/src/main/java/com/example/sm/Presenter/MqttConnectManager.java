@@ -69,7 +69,6 @@ public class MqttConnectManager {
         if(onEventMqttList == null)
             onEventMqttList = new ArrayList<>();
 
-        Log.d("htl",String.valueOf(onEventMqttList.size()));
         onEventMqttList.add(onEventMqtt);
 
     }

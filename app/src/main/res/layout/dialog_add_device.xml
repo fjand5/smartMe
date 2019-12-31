@@ -86,10 +86,23 @@
             android:layout_gravity="center"
     />
     </LinearLayout>
-    <Button
-        android:id="@+id/addAddDeviceBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Ok"/>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_weight="1">
+        <Button
+            android:id="@+id/addAddDeviceBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Ok"/>
+        <Button
+            android:id="@+id/cloneAddDeviceBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Nhân bản"/>
+    </LinearLayout>
+
 </LinearLayout>

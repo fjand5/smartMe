@@ -1,5 +1,6 @@
 package com.example.sm.Model;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -34,6 +35,15 @@ public class ListDeviceInfo{
 
     public void addDevice(Context context, String name,String topic, String cmdOn, String cmdOff){
         JSONArray tmp = getListDevice(context);
+        for (int i = 0; i<tmp.length(); i++){
+            try {
+                if(tmp.getJSONObject(i).getString("name").equals(name)){
+                    return;
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
         JSONObject jsonObject  = new JSONObject();
         try {
             jsonObject.put("name",name);
@@ -45,6 +55,46 @@ public class ListDeviceInfo{
         }
 
         tmp.put(jsonObject);
+        setListDevice(context,tmp);
+    }
+    public JSONObject getDevice(Context context, String name){
+        JSONArray tmp = getListDevice(context);
+        for (int i = 0; i<tmp.length(); i++){
+            try {
+                if(tmp.getJSONObject(i).getString("name").equals(name)){
+                    return tmp.getJSONObject(i);
+
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return new JSONObject();
+    }
+    @SuppressLint("NewApi")
+    public void editDevice(Context context,String beforName, String name, String topic, String cmdOn, String cmdOff){
+        JSONArray tmp = getListDevice(context);
+        JSONObject jsonObject  = new JSONObject();
+        try {
+            jsonObject.put("name",name);
+            jsonObject.put("cmdOn",cmdOn);
+            jsonObject.put("cmdOff",cmdOff);
+            jsonObject.put("topic",topic);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        for (int i = 0; i<tmp.length(); i++){
+            try {
+                if(tmp.getJSONObject(i).getString("name").equals(beforName)){
+                    tmp.remove(i);
+                    tmp.put(jsonObject);
+                    break;
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
         setListDevice(context,tmp);
     }
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)

@@ -21,6 +21,9 @@ import com.example.sm.Presenter.DeviceListView.Item;
 import com.example.sm.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,39 +52,12 @@ public class IoManagerActivity extends Activity{
             @Override
             public void onClick(View v) {
 
-                createDialog();
+                Adapter.getInstance().createDialog();
 
             }
         });
     }
 
-    private void createDialog() {
-        final Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.dialog_add_device);
-
-        final EditText nameAddDeviceTxt = dialog.findViewById(R.id.nameAddDeviceTxt);
-        final EditText cmdOnAddDeviceTxt = dialog.findViewById(R.id.cmdOnAddDeviceTxt);
-        final EditText cmdOffAddDeviceTxt = dialog.findViewById(R.id.cmdOffAddDeviceTxt);
-        final EditText topicAddDeviceTxt = dialog.findViewById(R.id.topicAddDeviceTxt);
-        Button addAddDeviceBtn = dialog.findViewById(R.id.addAddDeviceBtn);
-        addAddDeviceBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Adapter adapterNullAble = Adapter.getInstance();
-                if(adapterNullAble != null){
-                    adapterNullAble.addDevice(nameAddDeviceTxt.getText().toString(),
-                            topicAddDeviceTxt.getText().toString(),
-                            cmdOnAddDeviceTxt.getText().toString(),
-                            cmdOffAddDeviceTxt.getText().toString());
-                }
-                dialog.cancel();
-
-            }
-        });
-
-        Log.d("htl",ListDeviceInfo.getInstance().getListDevice(this).toString());
-        dialog.show();
-    }
 
     private void initView() {
         ioDeviceLsv = findViewById(R.id.ioDeviceLsv);
