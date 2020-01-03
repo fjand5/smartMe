@@ -34,5 +34,11 @@ public class Utils {
     public static void callActivity(Context curContext, Class<?> cls){
         callActivity(curContext,cls,true);
     }
+    public static int getHourFromTimeInMin(int timeInmin){
+        return timeInmin/60;
+    }
+    public static int getMinFromTimeInMin(int timeInmin){
+        return timeInmin%60;
+    }
 
 }

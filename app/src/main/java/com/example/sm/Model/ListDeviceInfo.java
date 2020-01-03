@@ -33,7 +33,7 @@ public class ListDeviceInfo{
         return instance;
     };
 
-    public void addDevice(Context context, String name,String topic, String cmdOn, String cmdOff){
+    public void addDevice(Context context, String name,String topic, String cmdOn, String cmdOff, int beginTime, int endTime){
         JSONArray tmp = getListDevice(context);
         for (int i = 0; i<tmp.length(); i++){
             try {
@@ -50,6 +50,8 @@ public class ListDeviceInfo{
             jsonObject.put("cmdOn",cmdOn);
             jsonObject.put("cmdOff",cmdOff);
             jsonObject.put("topic",topic);
+            jsonObject.put("start",beginTime);
+            jsonObject.put("end",endTime);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -72,7 +74,7 @@ public class ListDeviceInfo{
         return new JSONObject();
     }
     @SuppressLint("NewApi")
-    public void editDevice(Context context,String beforName, String name, String topic, String cmdOn, String cmdOff){
+    public void editDevice(Context context,String beforName, String name, String topic, String cmdOn, String cmdOff, int beginTime, int endTime){
         JSONArray tmp = getListDevice(context);
         JSONObject jsonObject  = new JSONObject();
         try {
@@ -80,6 +82,8 @@ public class ListDeviceInfo{
             jsonObject.put("cmdOn",cmdOn);
             jsonObject.put("cmdOff",cmdOff);
             jsonObject.put("topic",topic);
+            jsonObject.put("start",beginTime);
+            jsonObject.put("end",endTime);
         } catch (JSONException e) {
             e.printStackTrace();
         }
