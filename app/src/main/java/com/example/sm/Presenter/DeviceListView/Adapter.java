@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,6 +27,7 @@ import com.example.sm.Presenter.Utils.Utils;
 import com.example.sm.R;
 
 
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,7 +37,7 @@ import java.util.Set;
 
 public class Adapter extends ArrayAdapter<Item> {
     Context mContext;
-    static List<Item> listItem;
+    public static List<Item> listItem;
     static Adapter instance;
 
     static public Adapter getInstance(Context context, int resource, List<Item> objects){
@@ -52,6 +54,39 @@ public class Adapter extends ArrayAdapter<Item> {
         super(context, resource, objects);
         mContext = context;
         listItem = objects;
+
+        MqttConnectManager.getInstance().setOnEventMqtt(new MqttConnectManager.Callback() {
+            @Override
+            public void onDisconnect() {
+
+            }
+
+            @Override
+            public void onConnect() {
+
+            }
+
+            @Override
+            public void onMessageArrived(String topic, MqttMessage message) {
+                String content = new String(message.getPayload());
+
+                try {
+                    JSONObject jsonObject = new JSONObject(content);
+                    Log.d("htl",jsonObject.toString());
+                    for (Item item:
+                         listItem) {
+                        item.setCurBeginTime(jsonObject.getJSONObject(item.getName()).getInt("start"));
+                        item.setCurEndTime(jsonObject.getJSONObject(item.getName()).getInt("end"));
+
+                    }
+                    notifyDataSetInvalidated();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+        });
     }
 
 
@@ -68,6 +103,14 @@ public class Adapter extends ArrayAdapter<Item> {
         Button onDevideBtn = v.findViewById(R.id.onDevideBtn);
         Button offDevideBtn = v.findViewById(R.id.offDevideBtn);
         final TextView nameDeviceTxt = v.findViewById(R.id.nameDeviceTxt);
+        final TextView startTimeItemDeviceTxt = v.findViewById(R.id.startTimeItemDeviceTxt);
+        final TextView endTimeItemDeviceTxt = v.findViewById(R.id.endTimeItemDeviceTxt);
+        startTimeItemDeviceTxt.setText(
+                Utils.getTimeStringFromTimeInMin(listItem.get(position).getCurBeginTime())
+        );
+        endTimeItemDeviceTxt.setText(
+                Utils.getTimeStringFromTimeInMin(listItem.get(position).getCurEndTime())
+        );
         nameDeviceTxt.setText(listItem.get(position).getName());
         onDevideBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,51 +121,50 @@ public class Adapter extends ArrayAdapter<Item> {
                             listItem.get(position).getCmdOn());
             }
         });
-        offDevideBtn.setOnLongClickListener(new View.OnLongClickListener() {
+        startTimeItemDeviceTxt.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onLongClick(View v) {
-                new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        int timeInMin = hourOfDay*60 + minute;
-                        Log.d("htl",String.valueOf(timeInMin));
-                    }
-                },0,0,true).show();
-                return false;
+            public void onClick(View view) {
+                try {
+                    new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
+                        @Override
+                        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                            String timeInMin = String.valueOf(hourOfDay*60 + minute);
+                            String terminal2Send = listItem.get(position).getBeginTime().replace("@",timeInMin);
+                            MqttConnectManager.sendData(listItem.get(position).getTopic(),terminal2Send);
+
+                        }
+                    },
+                            0,
+                            0,
+                            true).show();
+                }
+                catch (WindowManager.BadTokenException e) {
+                    //use a log message
+                }
             }
         });
-        onDevideBtn.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        int timeInMin = hourOfDay*60 + minute;
-                        listItem.get(position).setBeginTime(timeInMin);
-                    }
-                },
-                        Utils.getHourFromTimeInMin(listItem.get(position).getBeginTime()),
-                        Utils.getMinFromTimeInMin(listItem.get(position).getBeginTime()),
-                        true).show();
-                return false;
-            }
-        });
-        offDevideBtn.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        int timeInMin = hourOfDay*60 + minute;
-                        listItem.get(position).setEndTime(timeInMin);
-                    }
-                },
-                        Utils.getHourFromTimeInMin(listItem.get(position).getEndTime()),
-                        Utils.getMinFromTimeInMin(listItem.get(position).getEndTime()),
-                        true).show();
-                return false;
-            }
-        });
+       endTimeItemDeviceTxt.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View view) {
+               try {
+                   new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
+                       @Override
+                       public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                           String timeInMin = String.valueOf(hourOfDay*60 + minute);
+                           String terminal2Send = listItem.get(position).getEndTime().replace("@",timeInMin);
+                           MqttConnectManager.sendData(listItem.get(position).getTopic(),terminal2Send);
+
+                       }
+                   },
+                           0,
+                           0,
+                           true).show();
+               }catch (WindowManager.BadTokenException e) {
+                   //use a log message
+               }
+           }
+       });
+
         offDevideBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -167,7 +209,7 @@ public class Adapter extends ArrayAdapter<Item> {
         return v;
     }
 
-    public void addDevice(String name, String topic, String cmdOn, String cmdOff, int beginTime, int endTime){
+    public void addDevice(String name, String topic, String cmdOn, String cmdOff, String beginTime, String endTime){
         ListDeviceInfo.getInstance().addDevice(mContext,
                 name,
                 topic,
@@ -178,7 +220,7 @@ public class Adapter extends ArrayAdapter<Item> {
         syncDevice();
     }
 
-    public void editDevice(String beforName, String name, String topic, String cmdOn, String cmdOff, int beginTime, int endTime){
+    public void editDevice(String beforName, String name, String topic, String cmdOn, String cmdOff, String beginTime, String endTime){
         ListDeviceInfo.getInstance().editDevice(mContext,
                 beforName,
                 name,
@@ -197,7 +239,7 @@ public class Adapter extends ArrayAdapter<Item> {
     public void removeDevice(String name){
         ListDeviceInfo.getInstance().removeDevice(mContext,name);
     }
-    void syncDevice(){
+    public  void syncDevice(){
         JSONArray tmp = ListDeviceInfo.getInstance().getListDevice(mContext);
         listItem.clear();
         for (int i = 0; i<tmp.length();i++) {
@@ -208,8 +250,10 @@ public class Adapter extends ArrayAdapter<Item> {
                         jsonObject.getString("topic"),
                         jsonObject.getString("cmdOn"),
                         jsonObject.getString("cmdOff"),
-                        jsonObject.getInt("start"),
-                        jsonObject.getInt("end")
+                        jsonObject.getString("start"),
+                        jsonObject.getString("end"),
+                        -1,
+                        -1
                 ));
             } catch (JSONException er) {
                 er.printStackTrace();
@@ -225,11 +269,10 @@ public class Adapter extends ArrayAdapter<Item> {
         final Dialog dialog = new Dialog(mContext);
         dialog.setContentView(R.layout.dialog_add_device);
         String _topic="",_name="",_on="",_off="";
-        int _startTime=0,_endTime=0;
+        String _startTime="",_endTime="";
         boolean wanaEdit=false;
         final Adapter adapterNullAble = Adapter.getInstance();
         JSONObject deviceJsonObj = adapterNullAble.getDevice(name);
-        Log.d("htl","name :" +name);
         if(!name.equals("")){
             wanaEdit = true;
             try {
@@ -237,8 +280,8 @@ public class Adapter extends ArrayAdapter<Item> {
                 _name=deviceJsonObj.getString("name");
                 _on=deviceJsonObj.getString("cmdOn");
                 _off=deviceJsonObj.getString("cmdOff");
-                _startTime=deviceJsonObj.getInt("start");
-                _endTime=deviceJsonObj.getInt("end");
+                _startTime=deviceJsonObj.getString("start");
+                _endTime=deviceJsonObj.getString("end");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -255,8 +298,8 @@ public class Adapter extends ArrayAdapter<Item> {
         cmdOnAddDeviceTxt.setText(_on);
         cmdOffAddDeviceTxt.setText(_off);
         topicAddDeviceTxt.setText(_topic);
-        startTimeAddDeviceTxt.setText(String.valueOf(_startTime));
-        endTimeAddDeviceTxt.setText(String.valueOf(_endTime));
+        startTimeAddDeviceTxt.setText(_startTime);
+        endTimeAddDeviceTxt.setText(_endTime);
         final boolean finalWanaEdit = wanaEdit;
         final String final_name = _name;
         addAddDeviceBtn.setOnClickListener(new View.OnClickListener() {
@@ -265,21 +308,19 @@ public class Adapter extends ArrayAdapter<Item> {
 
                 if(adapterNullAble != null){
                     if(finalWanaEdit){
-                        Log.d("htl","edit");
                         adapterNullAble.editDevice(final_name,nameAddDeviceTxt.getText().toString(),
                                 topicAddDeviceTxt.getText().toString(),
                                 cmdOnAddDeviceTxt.getText().toString(),
                                 cmdOffAddDeviceTxt.getText().toString(),
-                                Integer.valueOf(startTimeAddDeviceTxt.getText().toString()),
-                                Integer.valueOf(endTimeAddDeviceTxt.getText().toString()));
+                                startTimeAddDeviceTxt.getText().toString(),
+                                endTimeAddDeviceTxt.getText().toString());
                     }else{
-                        Log.d("htl","addDevice");
                         adapterNullAble.addDevice(nameAddDeviceTxt.getText().toString(),
                                 topicAddDeviceTxt.getText().toString(),
                                 cmdOnAddDeviceTxt.getText().toString(),
                                 cmdOffAddDeviceTxt.getText().toString(),
-                                Integer.valueOf(startTimeAddDeviceTxt.getText().toString()),
-                                Integer.valueOf(endTimeAddDeviceTxt.getText().toString()));
+                                startTimeAddDeviceTxt.getText().toString(),
+                                endTimeAddDeviceTxt.getText().toString());
                     }
 
                 }
@@ -295,8 +336,8 @@ public class Adapter extends ArrayAdapter<Item> {
                                 topicAddDeviceTxt.getText().toString(),
                                 cmdOnAddDeviceTxt.getText().toString(),
                                 cmdOffAddDeviceTxt.getText().toString(),
-                                Integer.valueOf(startTimeAddDeviceTxt.getText().toString()),
-                                Integer.valueOf(endTimeAddDeviceTxt.getText().toString()));
+                                startTimeAddDeviceTxt.getText().toString(),
+                                endTimeAddDeviceTxt.getText().toString());
                 }
                 dialog.cancel();
             }

@@ -11,7 +11,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 public class MqttInfo{
 
     static MqttInfo instance;
-    private MqttInfo(){};
+    private MqttInfo(){}
     public static MqttInfo getInstance(){
         if(instance == null){
             instance = new MqttInfo();

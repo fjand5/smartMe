@@ -33,7 +33,7 @@ public class ListDeviceInfo{
         return instance;
     };
 
-    public void addDevice(Context context, String name,String topic, String cmdOn, String cmdOff, int beginTime, int endTime){
+    public void addDevice(Context context, String name,String topic, String cmdOn, String cmdOff, String beginTime, String endTime){
         JSONArray tmp = getListDevice(context);
         for (int i = 0; i<tmp.length(); i++){
             try {
@@ -74,7 +74,7 @@ public class ListDeviceInfo{
         return new JSONObject();
     }
     @SuppressLint("NewApi")
-    public void editDevice(Context context,String beforName, String name, String topic, String cmdOn, String cmdOff, int beginTime, int endTime){
+    public void editDevice(Context context,String beforName, String name, String topic, String cmdOn, String cmdOff, String beginTime, String endTime){
         JSONArray tmp = getListDevice(context);
         JSONObject jsonObject  = new JSONObject();
         try {

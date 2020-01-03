@@ -40,5 +40,20 @@ public class Utils {
     public static int getMinFromTimeInMin(int timeInmin){
         return timeInmin%60;
     }
+    public static String getTimeStringFromTimeInMin(int timeInmin){
+        int h = getHourFromTimeInMin(timeInmin);
+        int m =  getMinFromTimeInMin(timeInmin);
+        String sh="";
+        if(h<10)
+            sh = "0"+h;
+        else
+            sh = ""+h;
+        String sm="";
+        if(m<10)
+            sm = "0"+m;
+        else
+            sm = ""+m;
+        return sh + ":" + sm;
+    }
 
 }

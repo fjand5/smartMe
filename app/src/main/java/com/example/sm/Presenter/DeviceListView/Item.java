@@ -5,22 +5,40 @@ public class Item {
     private String topic;
     private String cmdOn;
     private String cmdOff;
-    private int beginTime;
-    private int endTime;
+    private String beginTime;
+    private String endTime;
 
-    public int getBeginTime() {
+    private int curBeginTime;
+    private int curEndTime;
+    public String getBeginTime() {
         return beginTime;
     }
 
-    public void setBeginTime(int beginTime) {
+    public int getCurBeginTime() {
+        return curBeginTime;
+    }
+
+    public void setCurBeginTime(int curBeginTime) {
+        this.curBeginTime = curBeginTime;
+    }
+
+    public int getCurEndTime() {
+        return curEndTime;
+    }
+
+    public void setCurEndTime(int curEndTime) {
+        this.curEndTime = curEndTime;
+    }
+
+    public void setBeginTime(String beginTime) {
         this.beginTime = beginTime;
     }
 
-    public int getEndTime() {
+    public String getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(int endTime) {
+    public void setEndTime(String endTime) {
         this.endTime = endTime;
     }
 
@@ -32,13 +50,15 @@ public class Item {
         this.topic = topic;
     }
 
-    public Item(String name, String topic, String cmdOn, String cmdOff, int beginTime, int endTime) {
+    public Item(String name, String topic, String cmdOn, String cmdOff, String beginTime, String endTime, int curBeginTime, int curEndTime) {
         this.name = name;
         this.topic = topic;
         this.cmdOn = cmdOn;
         this.cmdOff = cmdOff;
         this.beginTime = beginTime;
         this.endTime = endTime;
+        this.curBeginTime = curBeginTime;
+        this.curEndTime = curEndTime;
     }
 
     public String getName() {
