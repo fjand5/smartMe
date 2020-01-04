@@ -1,29 +1,40 @@
-package com.example.sm.Model;
+package com.example.sm.Presenter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
-import android.util.JsonReader;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
+
+import com.example.sm.Model.SettingStore;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import java.util.Set;
-import java.util.TreeSet;
+import static com.example.sm.Presenter.Utils.Utils.isValidJsonArray;
 
 
 public class ListDeviceInfo{
 
     static ListDeviceInfo instance;
-
+    volatile String settingData="";
     private ListDeviceInfo(){
+    SettingStore.getInstance().setOnNewSettingListenner(new SettingStore.OnNewSettingListenner() {
+    @Override
+    public void onNewSetting(String key, String inComeNewSetting) {
 
+        if(key.equals(ListDeviceInfo.class.getName())){
+            Log.d("htl", "onNewSetting: " + inComeNewSetting);
+            settingData = inComeNewSetting;
+
+        }
+
+    }
+    });
     };
     public static ListDeviceInfo getInstance(){
         if(instance == null){
@@ -120,22 +131,11 @@ public class ListDeviceInfo{
         }
 
     }
-    public boolean isValidJsonArray(String jsonStr) {
-        Object json = null;
-        try {
-            json = new JSONTokener(jsonStr).nextValue();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        if (json instanceof JSONArray) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+
     public JSONArray getListDevice(Context context){
         JSONArray ret= null;
-        String data = getSharedPreferences(context).getString(ListDeviceInfo.class.getName(),"");
+
+        String data = settingData;
         if(isValidJsonArray(data)){
             try {
                 ret = new JSONArray(data);
@@ -149,24 +149,9 @@ public class ListDeviceInfo{
         return ret;
     }
     void setListDevice(Context context, JSONArray jsonArray){
-        getSharedPreferences(context)
-                .edit()
-                .remove(ListDeviceInfo.class.getName())
-                .putString(ListDeviceInfo.class.getName(),
-                        jsonArray.toString())
-        .apply();
+        SettingStore.getInstance().commitSetting(ListDeviceInfo.class.getName(),jsonArray.toString());
 
     }
-    public void clearDevice(Context context){
-        setListDevice(context,null);
-    }
-    private SharedPreferences getSharedPreferences(Context context){
-        SharedPreferences  ret;
-        ret = context.getSharedPreferences(
-                com.example.sm.Model.ListDeviceInfo.class.toString()
-                ,context.MODE_PRIVATE);
 
-        return ret;
-    }
 
 }

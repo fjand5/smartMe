@@ -68,6 +68,7 @@ public class MqttInfo{
             editor.putString("username",name).commit();
             editor.putString("password",pass).commit();
             editor.putString("topic",topic).commit();
+
     }
     private SharedPreferences getSharedPreferences(Context context){
         SharedPreferences  ret;

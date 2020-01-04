@@ -1,13 +1,14 @@
 package com.example.sm.Presenter.DeviceListView;
 
 
-import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Build;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,10 +22,14 @@ import android.widget.TimePicker;
 
 import androidx.annotation.RequiresApi;
 
-import com.example.sm.Model.ListDeviceInfo;
+import com.example.sm.Model.SettingStore;
+import com.example.sm.Presenter.IoManagerSetting;
+import com.example.sm.Presenter.ListDeviceInfo;
 import com.example.sm.Presenter.MqttConnectManager;
 import com.example.sm.Presenter.Utils.Utils;
 import com.example.sm.R;
+import com.example.sm.view.IoManagerActivity;
+import com.example.sm.view.MainActivity;
 
 
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -33,7 +38,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
-import java.util.Set;
 
 public class Adapter extends ArrayAdapter<Item> {
     Context mContext;
@@ -54,7 +58,12 @@ public class Adapter extends ArrayAdapter<Item> {
         super(context, resource, objects);
         mContext = context;
         listItem = objects;
-
+        IoManagerSetting.getInstance().setOnUpdateSettingDataListenner(new IoManagerSetting.OnUpdateSettingDataListenner() {
+            @Override
+            public void onUpdateSettingData() {
+                syncDevice();
+            }
+        });
         MqttConnectManager.getInstance().setOnEventMqtt(new MqttConnectManager.Callback() {
             @Override
             public void onDisconnect() {
@@ -72,12 +81,10 @@ public class Adapter extends ArrayAdapter<Item> {
 
                 try {
                     JSONObject jsonObject = new JSONObject(content);
-                    Log.d("htl",jsonObject.toString());
                     for (Item item:
                          listItem) {
                         item.setCurBeginTime(jsonObject.getJSONObject(item.getName()).getInt("start"));
                         item.setCurEndTime(jsonObject.getJSONObject(item.getName()).getInt("end"));
-
                     }
                     notifyDataSetInvalidated();
                 } catch (JSONException e) {
@@ -103,6 +110,7 @@ public class Adapter extends ArrayAdapter<Item> {
         Button onDevideBtn = v.findViewById(R.id.onDevideBtn);
         Button offDevideBtn = v.findViewById(R.id.offDevideBtn);
         final TextView nameDeviceTxt = v.findViewById(R.id.nameDeviceTxt);
+        final TextView deleteDeviceTxt = v.findViewById(R.id.deleteDeviceTxt);
         final TextView startTimeItemDeviceTxt = v.findViewById(R.id.startTimeItemDeviceTxt);
         final TextView endTimeItemDeviceTxt = v.findViewById(R.id.endTimeItemDeviceTxt);
         startTimeItemDeviceTxt.setText(
@@ -177,13 +185,12 @@ public class Adapter extends ArrayAdapter<Item> {
         nameDeviceTxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                createDialog(nameDeviceTxt.getText().toString());
+                createDialog(mContext,nameDeviceTxt.getText().toString());
             }
         });
-        nameDeviceTxt.setOnLongClickListener(new View.OnLongClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+        deleteDeviceTxt.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onLongClick(View view) {
+            public void onClick(View view) {
                 AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
                 dialog.setTitle("Xác nhận !")
                         .setMessage("Bạn có muốn xóa thiết bị này không ?")
@@ -195,6 +202,7 @@ public class Adapter extends ArrayAdapter<Item> {
                             }
                         })
                         .setPositiveButton("Có", new DialogInterface.OnClickListener() {
+                            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 Adapter.getInstance().removeDevice(nameDeviceTxt.getText().toString());
@@ -203,9 +211,9 @@ public class Adapter extends ArrayAdapter<Item> {
                         });
                 dialog.create();
                 dialog.show();
-                return false;
             }
         });
+
         return v;
     }
 
@@ -262,11 +270,11 @@ public class Adapter extends ArrayAdapter<Item> {
         notifyDataSetInvalidated();
     }
 
-    public void createDialog(){
-        createDialog("");
+    public void createDialog(Context context){
+        createDialog(context,"");
     }
-    public void createDialog(String name) {
-        final Dialog dialog = new Dialog(mContext);
+    public void createDialog(Context context,String name) {
+        final Dialog dialog = new Dialog(context);
         dialog.setContentView(R.layout.dialog_add_device);
         String _topic="",_name="",_on="",_off="";
         String _startTime="",_endTime="";
@@ -342,6 +350,10 @@ public class Adapter extends ArrayAdapter<Item> {
                 dialog.cancel();
             }
         });
-        dialog.show();
+
+
+            dialog.show();
+
+
     }
 }

@@ -53,8 +53,11 @@ public class MainService extends Service {
     public void onCreate() {
         name = getPackageName();
         super.onCreate();
+
         mqttBroadcast = new MqttBroadcast();
         registerReceiver(new MqttBroadcast(),new IntentFilter(MqttBroadcast.getActionName()));
+
+
     }
 
 

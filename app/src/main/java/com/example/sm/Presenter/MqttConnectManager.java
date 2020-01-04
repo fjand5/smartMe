@@ -47,9 +47,6 @@ public class MqttConnectManager {
             public void messageArrived(String topic, MqttMessage message) {
                 if(!isRunning())
                     return;
-                    
-                if(message.isRetained())
-                    return;
                 for (Callback onEventMqtt:
                         onEventMqttList) {
                     if (onEventMqtt != null)

@@ -26,6 +26,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.sm.InitSystem;
+import com.example.sm.Model.SettingStore;
 import com.example.sm.Presenter.MqttConnectManager;
 import com.example.sm.Presenter.MqttSetting;
 import com.example.sm.Presenter.RxDataListView.Adapter;
@@ -73,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initView();
         InitSystem.getInstancs(this);
 
+
     }
     @Override
     protected void onPause() {
@@ -90,9 +92,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d("htl","boot....");
         addEvent();
         MainService.beginService(this);
         setStatusView(Adapter.getStatus());
+
     }
 
 

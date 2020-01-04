@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.example.sm.Model.MqttInfo;
 import com.example.sm.Presenter.MqttSetting;
@@ -27,6 +28,10 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class MqttBroadcast extends BroadcastReceiverExt {
     static OnConnectStatusChange onConnectStatusChange;
+
+
+
+    static OnMessageArrivedListenner _onMessageArrivedListenner;
     static public boolean connectNow = false;
 
     static Context mContext;
@@ -43,9 +48,20 @@ public class MqttBroadcast extends BroadcastReceiverExt {
     static String _pass;
     static String _topicRx;
 
+    public static String get_topicRx() {
+        String ret;
+        ret = _topicRx.replace("#","")
+        .replace("/","");
+
+        return ret;
+    }
+
     public static void setOnConnectStatusChange(OnConnectStatusChange callback){
         onConnectStatusChange=callback;
 
+    }
+    public static void setOnMessageArrivedListenner(OnMessageArrivedListenner onMessageArrivedListenner) {
+        _onMessageArrivedListenner = onMessageArrivedListenner;
     }
     public static boolean getStatus(){
         if(client == null)
@@ -81,11 +97,29 @@ public class MqttBroadcast extends BroadcastReceiverExt {
 
 
     }
+    public static void reSubcribe(){
+        try {
+
+            client.subscribe(_topicRx, 2, mContext, new IMqttActionListener() {
+                @Override
+                public void onSuccess(IMqttToken asyncActionToken) {
+                    if(onConnectStatusChange != null)
+                        onConnectStatusChange.onConnect();
+                }
+
+                @Override
+                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                    if(onConnectStatusChange != null)
+                        onConnectStatusChange.onDisconnect();
+                }
+            });
+
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+    }
     public  void initMqttConnection(){
         getInfo();
-
-
-
         options = new MqttConnectOptions();
         clientId = MqttClient.generateClientId();
 
@@ -100,17 +134,27 @@ public class MqttBroadcast extends BroadcastReceiverExt {
             @Override
             public void onSuccess(IMqttToken asyncActionToken) {
                 connectNow=false;
-                if(onConnectStatusChange != null)
-                    onConnectStatusChange.onConnect();
-
                 try {
 
-                    client.subscribe(_topicRx,2);
+                    client.subscribe(_topicRx, 2, mContext, new IMqttActionListener() {
+                        @Override
+                        public void onSuccess(IMqttToken asyncActionToken) {
+                            if(onConnectStatusChange != null)
+                                onConnectStatusChange.onConnect();
+                        }
 
+                        @Override
+                        public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                            if(onConnectStatusChange != null)
+                                onConnectStatusChange.onDisconnect();
+                        }
+                    });
 
                 } catch (MqttException e) {
                     e.printStackTrace();
                 }
+                if(onConnectStatusChange != null)
+                    onConnectStatusChange.onConnect();
 
             }
 
@@ -137,7 +181,11 @@ public class MqttBroadcast extends BroadcastReceiverExt {
             @Override
             public void messageArrived(String topic, MqttMessage message) {
 
-                onConnectStatusChange.messageArrived( topic,  message);
+                if(_onMessageArrivedListenner!=null)
+                    _onMessageArrivedListenner.onMessageArrived(topic,  message);
+                if(onConnectStatusChange!=null)
+                    onConnectStatusChange.messageArrived( topic,  message);
+
 
             }
 
@@ -162,7 +210,7 @@ public class MqttBroadcast extends BroadcastReceiverExt {
         if(client == null)
             return;
         try {
-            client.publish(topic ,content.getBytes(),1,false);
+            client.publish(topic ,content.getBytes(),2,retain);
         } catch (MqttException e) {
             e.printStackTrace();
         }
@@ -173,4 +221,7 @@ public class MqttBroadcast extends BroadcastReceiverExt {
         void onConnect();
         void messageArrived(String topic, MqttMessage message);
     }
+    public interface OnMessageArrivedListenner{
+      void onMessageArrived(String topic, MqttMessage message);
+    };
 }

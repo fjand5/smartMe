@@ -6,6 +6,7 @@ import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
+import com.example.sm.Model.SettingStore;
 import com.example.sm.Presenter.MqttConnectManager;
 import com.example.sm.view.RingActivity;
 
@@ -62,6 +63,8 @@ public class InitSystem {
             @RequiresApi(api = Build.VERSION_CODES.Q)
             @Override
             public void onMessageArrived(String topic, MqttMessage message) {
+                if(message.isRetained())
+                    return;
                 String content = new String(message.getPayload());
                 JSONObject jsonObject  = null;
                 try {

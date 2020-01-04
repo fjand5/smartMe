@@ -10,6 +10,11 @@ import androidx.annotation.RequiresApi;
 
 import com.example.sm.view.RingActivity;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
 public class Utils {
     private Utils() {
 
@@ -54,6 +59,32 @@ public class Utils {
         else
             sm = ""+m;
         return sh + ":" + sm;
+    }
+    public static boolean isValidJsonArray(String jsonStr) {
+        Object json = null;
+        try {
+            json = new JSONTokener(jsonStr).nextValue();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if (json instanceof JSONArray) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    public static boolean isValidJsonObject(String jsonStr) {
+        Object json = null;
+        try {
+            json = new JSONTokener(jsonStr).nextValue();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if (json instanceof JSONObject) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }
