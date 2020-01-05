@@ -207,10 +207,14 @@ public class MqttBroadcast extends BroadcastReceiverExt {
         publish(topic ,content,false);
     }
     static public void publish(String topic, String content, boolean retain){
-        if(client == null)
+        if(client == null){
+
             return;
+        }
+
         try {
             client.publish(topic ,content.getBytes(),2,retain);
+
         } catch (MqttException e) {
             e.printStackTrace();
         }

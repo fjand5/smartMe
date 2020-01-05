@@ -16,28 +16,31 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 public class Utils {
+
     private Utils() {
 
     };
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
-    public static void callActivity(Context curContext, Class<?> cls, boolean oneTime){
+    public static void callActivity(Context curContext, Class<?> cls,String msg ,boolean oneTime){
         ActivityManager am = (ActivityManager)curContext.getSystemService(curContext.ACTIVITY_SERVICE);
         String topAct = am.getRunningTasks(1).get(0).topActivity.getClassName();
         if(!oneTime){
             Intent i = new Intent(curContext, cls);
+            i.putExtra("msg",msg);
             curContext.startActivity(i);
             return;
         }
         if(!topAct.equals(cls.getName())){
             Intent i = new Intent(curContext, cls);
+            i.putExtra("msg",msg);
             curContext.startActivity(i);
         }
 
     }
     @RequiresApi(api = Build.VERSION_CODES.Q)
     public static void callActivity(Context curContext, Class<?> cls){
-        callActivity(curContext,cls,true);
+        callActivity(curContext,cls,"",true);
     }
     public static int getHourFromTimeInMin(int timeInmin){
         return timeInmin/60;

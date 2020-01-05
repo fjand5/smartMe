@@ -52,6 +52,7 @@ public class SettingStore {
     }
 
     public void commitSetting(String key, String newSetting){
+
         MqttBroadcast.publish(MqttBroadcast.get_topicRx()+"/"+key,newSetting,true);
     }
     public interface OnNewSettingListenner{

@@ -2,6 +2,7 @@ package com.example.sm.view;
 
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Layout;
@@ -25,12 +26,13 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.example.sm.InitSystem;
+
 import com.example.sm.Model.SettingStore;
 import com.example.sm.Presenter.MqttConnectManager;
 import com.example.sm.Presenter.MqttSetting;
 import com.example.sm.Presenter.RxDataListView.Adapter;
 import com.example.sm.Presenter.RxDataListView.Item;
+import com.example.sm.Presenter.Utils.Utils;
 import com.example.sm.R;
 import com.example.sm.BackgroudProccess.MainService;
 
@@ -43,7 +45,7 @@ import static android.view.inputmethod.InputMethodManager.HIDE_IMPLICIT_ONLY;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener,
         GestureDetector.OnGestureListener {
-    private static final String DEBUG_TAG = "htl";
+
     ImageView settingImg,statusImg;
     TextView statusTxt;
     ProgressBar statusBar;
@@ -65,20 +67,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     MqttConnectManager.Callback callback;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+        AlarmActivity.initAlarmSystem(this);
         detector = new GestureDetector(this,this);
         initView();
-        InitSystem.getInstancs(this);
+
+
+
 
 
     }
     @Override
     protected void onPause() {
-        MqttConnectManager.getInstance().removeOnEventMqtt(callback);
+        if(callback!=null)
+            MqttConnectManager.getInstance().removeOnEventMqtt(callback);
         super.onPause();
     }
 
@@ -123,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         MqttConnectManager.getInstance().setOnEventMqtt(callback);
     }
 
-    @SuppressLint("WrongViewCast")
+
     private void initView() {
         getSupportActionBar().hide();
         menuFrag = new MenuFrag();

@@ -3,6 +3,7 @@ package com.example.sm.view;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.media.Ringtone;
 import android.os.Build;
@@ -18,11 +19,13 @@ import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 
-import com.example.sm.InitSystem;
+import com.example.sm.Presenter.AlarmSetting;
 import com.example.sm.Presenter.MqttConnectManager;
 import com.example.sm.R;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -30,48 +33,37 @@ import static com.example.sm.Presenter.Utils.Utils.callActivity;
 
 
 public class AlarmActivity extends Activity {
-    TextView curDeltaTxt;
-    TextView statusResTxt;
-    TextView curThresholdTxt;
-    EditText desDeltaTxt;
-    Button setDeltaBtn,calibBtn;
-
-    MqttConnectManager.Callback callback;
-    CountDownTimer countDownTimer;
+   FloatingActionButton addAlarmBtn;
+   static Context mContext;
     @Override
     protected void onPause() {
-        InitSystem.setSendSignalFlag(false);
-        MqttConnectManager.getInstance().removeOnEventMqtt(callback);
         super.onPause();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_alarm_manager);
         initView();
-        countDownTimer = new CountDownTimer(5000,5000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
 
-            }
 
-            @Override
-            public void onFinish() {
-                statusResTxt.setText("Mất kết nối với thiết bị");
-            }
-
-        };
 
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        MqttConnectManager.sendData("luat/espAL/rx","{\"cmd\":\"GOJ\",\"obj\":\"\"}");
-        InitSystem.setSendSignalFlag(true);
-        countDownTimer.start();
-        callback = new MqttConnectManager.Callback() {
+
+
+    private void addEvent() {
+
+    }
+
+    private void initView() {
+        addAlarmBtn =  findViewById(R.id.addAlarmBtn);
+    }
+
+    public static void initAlarmSystem(Context context){
+        mContext=context;
+        MqttConnectManager.getInstance().setOnEventMqtt(new MqttConnectManager.Callback() {
             @Override
             public void onDisconnect() {
 
@@ -79,97 +71,43 @@ public class AlarmActivity extends Activity {
 
             @Override
             public void onConnect() {
-
+                AlarmSetting.getInstance().addAlarm("tivi","luat/espAL/tx",
+                        "{\"cmd\":\"ALR\"}");
             }
 
             @RequiresApi(api = Build.VERSION_CODES.Q)
             @Override
             public void onMessageArrived(String topic, MqttMessage message) {
-                countDownTimer.cancel();
-                statusResTxt.setText("Đang kết nối");
-                countDownTimer.start();
-                String content = new String(message.getPayload());
-                Log.d("htl",content);
+                if(message.isRetained())
+                    return;
+                    String content = new String(message.getPayload());
+                    JSONArray jsonArray = AlarmSetting.getInstance().getListAlarm();
 
-                try {
-                    JSONObject jsonObject  =new JSONObject(content);
-                    if(jsonObject.has("cmd")
-                            && jsonObject.get("cmd").equals("GDT")){
-                        float val = jsonObject.getInt("val");
-                        curDeltaTxt.setText(String.valueOf(val));
-
-                    } if(jsonObject.has("MPU")){
-                        JSONObject mpuObj = jsonObject.getJSONObject("MPU");
-                        float val = mpuObj.getInt("delta");
-                        curThresholdTxt.setText(String.valueOf(val));
-                    }
-
-
-
-                    }catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        addEvent();
-    }
-
-
-
-    private void addEvent() {
-        calibBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                    String tmp = null;
+                    for (int i = 0; i<jsonArray.length(); i++){
                     try {
-                        tmp = new JSONObject().put("cmd","SBL").toString();
+                        String alarmTopic = jsonArray.getJSONObject(i).getString("topic");
+                        String alarmContent = jsonArray.getJSONObject(i).getString("content");
+                         String name = jsonArray.getJSONObject(i).getString("name");
+                        if(alarmTopic.equals(topic)
+                        && alarmContent.equals(content)){
+                            Log.d("htl","bao dong");
+                            callRingActiity(name);
+
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    MqttConnectManager.sendData("luat/espAL/rx",tmp);
-                RingActivity.ringtone.stop();
-
-
-            }
-        });
-        setDeltaBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String tmp = null;
-                try {
-                    tmp = new JSONObject().put("cmd","SDT")
-                            .put("delta",desDeltaTxt.getText()).toString();
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
-                MqttConnectManager.sendData("luat/espAL/rx",tmp);
-
-                new CountDownTimer(100,100){
-
-                    @Override
-                    public void onTick(long l) {
-
-                    }
-
-                    @Override
-                    public void onFinish() {
-                        MqttConnectManager.sendData("luat/espAL/rx","{\"cmd\":\"GOJ\",\"obj\":\"\"}");
-
-                    }
-                }.start();
             }
         });
-        MqttConnectManager.getInstance().setOnEventMqtt(callback);
+
+
+        return;
     }
 
-    private void initView() {
-        curDeltaTxt =  findViewById(R.id.curDeltaTxt);
-        curThresholdTxt =  findViewById(R.id.curThresholdTxt);
-        desDeltaTxt = findViewById(R.id.desDeltaTxt);
-        statusResTxt = findViewById(R.id.statusResTxt);
-        setDeltaBtn = findViewById(R.id.setDeltaBtn);
-        calibBtn = findViewById(R.id.calibBtn);
-    }
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    private static void callRingActiity(String msg) {
+        callActivity(mContext, RingActivity.class,msg,true);
 
+    }
 }

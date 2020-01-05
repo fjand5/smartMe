@@ -14,15 +14,7 @@ import java.util.ArrayList;
 public class MqttConnectManager {
     static MqttConnectManager instance;
     private ArrayList<Callback> onEventMqttList;
-    boolean isRunning = true;
 
-    public boolean isRunning() {
-        return isRunning;
-    }
-
-    public void setRunning(boolean running) {
-        isRunning = running;
-    }
 
     private MqttConnectManager() {
         MqttBroadcast.setOnConnectStatusChange(new MqttBroadcast.OnConnectStatusChange() {
@@ -45,8 +37,6 @@ public class MqttConnectManager {
             }
             @Override
             public void messageArrived(String topic, MqttMessage message) {
-                if(!isRunning())
-                    return;
                 for (Callback onEventMqtt:
                         onEventMqttList) {
                     if (onEventMqtt != null)

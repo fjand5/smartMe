@@ -23,6 +23,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import com.example.sm.R;
+import com.example.sm.view.AlarmActivity;
 
 import static android.widget.Toast.LENGTH_LONG;
 
@@ -69,6 +70,7 @@ public class MainService extends Service {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             initFore();
         }
+
         return START_REDELIVER_INTENT;
     }
 
@@ -120,17 +122,6 @@ public class MainService extends Service {
 
         rv= new RemoteViews(getPackageName(),R.layout.notify_layout);
 
-        Intent i = new Intent(this, HandleNotifyService.class);
-        i.putExtra("state",false);
-        rv.setOnClickPendingIntent(R.id.pauseBtn,
-                PendingIntent.getService(this,0,i,PendingIntent.FLAG_CANCEL_CURRENT));
-
-
-        i = new Intent(this, HandleNotifyService.class);
-        i.putExtra("state",true);
-        rv.setOnClickPendingIntent(R.id.resumeBtn,
-                PendingIntent.getService(this,0,i,PendingIntent.FLAG_CANCEL_CURRENT));
-        ntf.setCustomContentView(rv);
 
 
         startForeground(MAIN_ID, ntf.build());
