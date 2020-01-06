@@ -70,11 +70,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     MqttConnectManager.Callback callback;
 
+    public static Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        mContext=this;
         setContentView(R.layout.activity_main);
         AlarmActivity.initAlarmSystem(this);
         detector = new GestureDetector(this,this);

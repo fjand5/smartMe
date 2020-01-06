@@ -47,25 +47,25 @@ public class Adapter  extends ArrayAdapter<Item> {
         mContext = context;
         listItem =objects;
 
-//        MqttConnectManager.getInstance().setOnEventMqtt(new MqttConnectManager.Callback() {
-//            @Override
-//            public void onDisconnect() {
-//
-//            }
-//
-//            @Override
-//            public void onConnect() {
-//
-//            }
-//
-//            @Override
-//            public void onMessageArrived(String topic, MqttMessage message) {
-//                if(listItem !=null){
-//                    listItem.add(new Item(message.isRetained(), topic, new String(message.getPayload())));
-//                    Adapter.instance.notifyDataSetInvalidated();
-//                }
-//            }
-//        });
+        MqttConnectManager.getInstance().setOnEventMqtt(new MqttConnectManager.Callback() {
+            @Override
+            public void onDisconnect() {
+
+            }
+
+            @Override
+            public void onConnect() {
+
+            }
+
+            @Override
+            public void onMessageArrived(String topic, MqttMessage message) {
+                if(listItem !=null){
+                    listItem.add(new Item(message.isRetained(), topic, new String(message.getPayload())));
+                    Adapter.instance.notifyDataSetInvalidated();
+                }
+            }
+        });
 
     }
 

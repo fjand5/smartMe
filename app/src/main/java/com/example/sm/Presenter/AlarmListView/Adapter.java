@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -28,6 +29,7 @@ import com.example.sm.Presenter.MqttConnectManager;
 import com.example.sm.Presenter.Utils.Utils;
 import com.example.sm.R;
 import com.example.sm.view.AlarmActivity;
+import com.example.sm.view.MainActivity;
 
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONArray;
@@ -38,7 +40,7 @@ import java.util.List;
 
 public class Adapter extends ArrayAdapter<Item> {
     static Adapter instance;
-    Context mContext;
+    static Context mContext;
     List<Item> listItem;
     Adapter(@NonNull Context context, int resource, List<Item> objects) {
         super(context, resource, objects);
@@ -86,9 +88,11 @@ public class Adapter extends ArrayAdapter<Item> {
         View v = convertView;
 
         if(v == null) {
-            LayoutInflater layoutInflater = LayoutInflater.from(mContext);
+
+            LayoutInflater layoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v = layoutInflater.inflate(R.layout.item_alarm, null);
         }
+
             final TextView name = v.findViewById(R.id.alarmNameTxt);
             final Button deleteAlarmBtn = v.findViewById(R.id.deleteAlarmBtn);
             name.setText(listItem.get(position).name);
@@ -96,35 +100,13 @@ public class Adapter extends ArrayAdapter<Item> {
                 @RequiresApi(api = Build.VERSION_CODES.Q)
                 @Override
                 public void onClick(View view) {
-                    AlertDialog.Builder dialog = new AlertDialog.Builder(view.getContext());
-                    dialog.setTitle("Xác nhận !")
-                            .setMessage("Bạn có muốn xóa cảnh báo này không ?")
-                            .setIcon(R.drawable.icon)
-                            .setNegativeButton("Không", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-
-                                }
-                            })
-                            .setPositiveButton("Có", new DialogInterface.OnClickListener() {
-                                @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    Adapter.getInstance().removeAlarm(name.getText().toString());
-                                    syncAlarm();
-                                }
-                            });
-                    dialog.create();
-                    if (! ((Activity) mContext).isFinishing()) {
-                        dialog.show();
-                    }
-//                    dialog.show();
+                    AlarmActivity.confirmDialog(name.getText().toString());
                 }
             });
             name.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    createDialog(view.getContext(), name.getText().toString());
+                    AlarmActivity.createDialog(name.getText().toString());
                 }
             });
 
@@ -167,85 +149,5 @@ public class Adapter extends ArrayAdapter<Item> {
     }
 
 
-    public static void createDialog(Context context){
 
-        createDialog(context,"");
-    }
-    public static void createDialog(Context context,String name) {
-        final Dialog dialog = new Dialog(context);
-
-        String _topic="",_name="",_content="",_respone="";
-        boolean wanaEdit=false;
-        final Adapter adapterNullAble = Adapter.getInstance();
-        JSONObject deviceJsonObj = adapterNullAble.getAlarm(name);
-        if(!name.equals("")){
-            wanaEdit = true;
-            try {
-                _topic=deviceJsonObj.getString("topic");
-                _name=deviceJsonObj.getString("name");
-                _content=deviceJsonObj.getString("content");
-                _respone=deviceJsonObj.getString("respone");
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        dialog.setContentView(R.layout.dialog_add_alarm);
-        final EditText nameAddAlarmTxt = dialog.findViewById(R.id.nameAddAlarmTxt);
-        final EditText topicAddAlarmTxt = dialog.findViewById(R.id.topicAddAlarmTxt);
-        final EditText contentAddAlarmTxt = dialog.findViewById(R.id.contentAddAlarmTxt);
-        final EditText responeAddAlarmTxt = dialog.findViewById(R.id.responeAddAlarmTxt);
-
-        Button addAddAlarmBtn = dialog.findViewById(R.id.addAddAlarmBtn);
-        Button cloneAddAlarmBtn = dialog.findViewById(R.id.cloneAddAlarmBtn);
-        nameAddAlarmTxt.setText(_name);
-        topicAddAlarmTxt.setText(_topic);
-        contentAddAlarmTxt.setText(_content);
-        responeAddAlarmTxt.setText(_respone);
-
-        final boolean finalWanaEdit = wanaEdit;
-        final String final_name = _name;
-        addAddAlarmBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if(adapterNullAble != null){
-                    if(finalWanaEdit){
-                        adapterNullAble.editAlarm(final_name,nameAddAlarmTxt.getText().toString(),
-                                topicAddAlarmTxt.getText().toString(),
-                                contentAddAlarmTxt.getText().toString(),
-                                responeAddAlarmTxt.getText().toString());
-                    }else{
-                        adapterNullAble.addAlarm(nameAddAlarmTxt.getText().toString(),
-                                topicAddAlarmTxt.getText().toString(),
-                                contentAddAlarmTxt.getText().toString(),
-                                responeAddAlarmTxt.getText().toString());
-                    }
-
-                }
-                dialog.cancel();
-
-            }
-        });
-        cloneAddAlarmBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(adapterNullAble != null){
-                    adapterNullAble.addAlarm(nameAddAlarmTxt.getText().toString()+ " - coppy",
-                            topicAddAlarmTxt.getText().toString(),
-                            contentAddAlarmTxt.getText().toString(),
-                            responeAddAlarmTxt.getText().toString());
-                }
-                dialog.cancel();
-            }
-        });
-
-        if (! ((Activity) context).isFinishing()) {
-            dialog.show();
-        }else{
-            Log.d("htl","isFinishing LV");
-        }
-
-
-    }
 }

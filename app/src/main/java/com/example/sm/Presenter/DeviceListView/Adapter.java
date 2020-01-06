@@ -53,6 +53,7 @@ public class Adapter extends ArrayAdapter<Item> {
         IoManagerSetting.getInstance().setOnUpdateSettingDataListenner(new IoManagerSetting.OnUpdateSettingDataListenner() {
             @Override
             public void onUpdateSettingData() {
+
                 instance.syncDevice();
             }
         });
@@ -73,16 +74,19 @@ public class Adapter extends ArrayAdapter<Item> {
 
                 try {
                     JSONObject jsonObject = new JSONObject(content);
+
                     for (Item item:
                             listItem) {
                         item.setCurBeginTime(jsonObject.getJSONObject(item.getName()).getInt("start"));
                         item.setCurEndTime(jsonObject.getJSONObject(item.getName()).getInt("end"));
+
                     }
-                    instance.notifyDataSetInvalidated();
+
+                    instance.syncDevice();
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
 
             }
         });
@@ -99,6 +103,7 @@ public class Adapter extends ArrayAdapter<Item> {
         mContext = context;
         listItem = objects;
 
+
     }
 
 
@@ -108,7 +113,7 @@ public class Adapter extends ArrayAdapter<Item> {
         View v = convertView;
 
         if(v == null){
-            LayoutInflater layoutInflater = LayoutInflater.from(mContext);
+            LayoutInflater layoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v = layoutInflater.inflate(R.layout.item_io_device,null);
 
         }
@@ -137,44 +142,13 @@ public class Adapter extends ArrayAdapter<Item> {
         startTimeItemDeviceTxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
-                        @Override
-                        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                            String timeInMin = String.valueOf(hourOfDay*60 + minute);
-                            String terminal2Send = listItem.get(position).getBeginTime().replace("@",timeInMin);
-                            MqttConnectManager.sendData(listItem.get(position).getTopic(),terminal2Send);
-
-                        }
-                    },
-                            0,
-                            0,
-                            true).show();
-                }
-                catch (WindowManager.BadTokenException e) {
-                    //use a log message
-                }
+              IoManagerActivity.createTimePicker(listItem.get(position).getTopic(),listItem.get(position).getBeginTime());
             }
         });
        endTimeItemDeviceTxt.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View view) {
-               try {
-                   new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
-                       @Override
-                       public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                           String timeInMin = String.valueOf(hourOfDay*60 + minute);
-                           String terminal2Send = listItem.get(position).getEndTime().replace("@",timeInMin);
-                           MqttConnectManager.sendData(listItem.get(position).getTopic(),terminal2Send);
-
-                       }
-                   },
-                           0,
-                           0,
-                           true).show();
-               }catch (WindowManager.BadTokenException e) {
-                   //use a log message
-               }
+               IoManagerActivity.createTimePicker(listItem.get(position).getTopic(),listItem.get(position).getEndTime());
            }
        });
 
@@ -190,37 +164,13 @@ public class Adapter extends ArrayAdapter<Item> {
         nameDeviceTxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                createDialog(view.getContext(),nameDeviceTxt.getText().toString());
+                IoManagerActivity.createDialog(nameDeviceTxt.getText().toString());
             }
         });
         deleteDeviceTxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
-                dialog.setTitle("Xác nhận !")
-                        .setMessage("Bạn có muốn xóa thiết bị này không ?")
-                        .setIcon(R.drawable.icon)
-                        .setNegativeButton("Không", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-
-                            }
-                        })
-                        .setPositiveButton("Có", new DialogInterface.OnClickListener() {
-                            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                Adapter.getInstance().removeDevice(nameDeviceTxt.getText().toString());
-                                syncDevice();
-                            }
-                        });
-                dialog.create();
-                if (! ((Activity) mContext).isFinishing()) {
-                    dialog.show();
-                }else{
-                    Log.d("htl","isFinishing DV");
-                }
-//                dialog.show();
+             IoManagerActivity.confirmDialog(nameDeviceTxt.getText().toString());
             }
         });
 
@@ -280,91 +230,5 @@ public class Adapter extends ArrayAdapter<Item> {
         notifyDataSetInvalidated();
     }
 
-    public static void createDialog(Context context){
-        createDialog(context,"");
-    }
-    public static void createDialog(Context context,String name) {
-        final Dialog dialog = new Dialog(context);
-        dialog.setContentView(R.layout.dialog_add_device);
-        String _topic="",_name="",_on="",_off="";
-        String _startTime="",_endTime="";
-        boolean wanaEdit=false;
-        final Adapter adapterNullAble = Adapter.getInstance();
-        JSONObject deviceJsonObj = adapterNullAble.getDevice(name);
-        if(!name.equals("")){
-            wanaEdit = true;
-            try {
-                _topic=deviceJsonObj.getString("topic");
-                _name=deviceJsonObj.getString("name");
-                _on=deviceJsonObj.getString("cmdOn");
-                _off=deviceJsonObj.getString("cmdOff");
-                _startTime=deviceJsonObj.getString("start");
-                _endTime=deviceJsonObj.getString("end");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        final EditText nameAddDeviceTxt = dialog.findViewById(R.id.nameAddDeviceTxt);
-        final EditText cmdOnAddDeviceTxt = dialog.findViewById(R.id.cmdOnAddDeviceTxt);
-        final EditText cmdOffAddDeviceTxt = dialog.findViewById(R.id.cmdOffAddDeviceTxt);
-        final EditText startTimeAddDeviceTxt = dialog.findViewById(R.id.startTimeAddDeviceTxt);
-        final EditText endTimeAddDeviceTxt = dialog.findViewById(R.id.endTimeAddDeviceTxt);
-        final EditText topicAddDeviceTxt = dialog.findViewById(R.id.topicAddDeviceTxt);
-        Button addAddDeviceBtn = dialog.findViewById(R.id.addAddDeviceBtn);
-        Button cloneAddDeviceBtn = dialog.findViewById(R.id.cloneAddDeviceBtn);
-        nameAddDeviceTxt.setText(_name);
-        cmdOnAddDeviceTxt.setText(_on);
-        cmdOffAddDeviceTxt.setText(_off);
-        topicAddDeviceTxt.setText(_topic);
-        startTimeAddDeviceTxt.setText(_startTime);
-        endTimeAddDeviceTxt.setText(_endTime);
-        final boolean finalWanaEdit = wanaEdit;
-        final String final_name = _name;
-        addAddDeviceBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                if(adapterNullAble != null){
-                    if(finalWanaEdit){
-                        adapterNullAble.editDevice(final_name,nameAddDeviceTxt.getText().toString(),
-                                topicAddDeviceTxt.getText().toString(),
-                                cmdOnAddDeviceTxt.getText().toString(),
-                                cmdOffAddDeviceTxt.getText().toString(),
-                                startTimeAddDeviceTxt.getText().toString(),
-                                endTimeAddDeviceTxt.getText().toString());
-                    }else{
-                        adapterNullAble.addDevice(nameAddDeviceTxt.getText().toString(),
-                                topicAddDeviceTxt.getText().toString(),
-                                cmdOnAddDeviceTxt.getText().toString(),
-                                cmdOffAddDeviceTxt.getText().toString(),
-                                startTimeAddDeviceTxt.getText().toString(),
-                                endTimeAddDeviceTxt.getText().toString());
-                    }
-
-                }
-                dialog.cancel();
-            }
-        });
-        cloneAddDeviceBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(adapterNullAble != null){
-                        adapterNullAble.addDevice(nameAddDeviceTxt.getText().toString()+" - copy",
-                                topicAddDeviceTxt.getText().toString(),
-                                cmdOnAddDeviceTxt.getText().toString(),
-                                cmdOffAddDeviceTxt.getText().toString(),
-                                startTimeAddDeviceTxt.getText().toString(),
-                                endTimeAddDeviceTxt.getText().toString());
-                }
-                dialog.cancel();
-            }
-        });
-        if (! ((Activity) context).isFinishing()) {
-            dialog.show();
-        }
-
-//            dialog.show();
-
-
-    }
 }

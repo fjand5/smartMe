@@ -40,8 +40,10 @@ public class IoManagerSetting {
         SettingStore.getInstance().setOnNewSettingListenner(new SettingStore.OnNewSettingListenner() {
             @Override
             public void onNewSetting(String key, String inComeNewSetting) {
+
                 if(key.equals(IoManagerSetting.class.getName())
                 && Utils.isValidJsonObject(inComeNewSetting)){
+
                     if(_onUpdateSettingDataListenner != null)
                         _onUpdateSettingDataListenner.onUpdateSettingData();
                     try {

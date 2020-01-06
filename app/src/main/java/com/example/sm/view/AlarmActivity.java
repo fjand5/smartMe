@@ -2,8 +2,11 @@ package com.example.sm.view;
 
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.Ringtone;
 import android.os.Build;
@@ -43,7 +46,7 @@ public class AlarmActivity extends Activity {
    ListView alarmLsv;
    List<Item> alarmItems;
    Adapter  alarmAdapter;
-
+    public static Context mContext;
     @Override
     protected void onPause() {
 
@@ -59,7 +62,6 @@ public class AlarmActivity extends Activity {
         super.onResume();
         alarmItems = new ArrayList<>();
         alarmAdapter = Adapter.getInstance(this, R.layout.item_alarm,alarmItems);
-
         alarmLsv.setAdapter(alarmAdapter);
         alarmAdapter.notifyDataSetInvalidated();
     }
@@ -67,6 +69,7 @@ public class AlarmActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mContext = this;
         setContentView(R.layout.activity_alarm_manager);
         initView();
         addEvent();
@@ -81,7 +84,7 @@ public class AlarmActivity extends Activity {
         addAlarmBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Adapter.createDialog(view.getContext());
+                createDialog();
             }
         });
     }
@@ -140,4 +143,107 @@ public class AlarmActivity extends Activity {
         callActivity(context, RingActivity.class,msg,true);
 
     }
+    public static void confirmDialog(final String name){
+        AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
+        dialog.setTitle("Xác nhận !")
+                .setMessage("Bạn có muốn xóa cảnh báo này không ?")
+                .setIcon(R.drawable.icon)
+                .setNegativeButton("Không", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
+                .setPositiveButton("Có", new DialogInterface.OnClickListener() {
+                    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Adapter.getInstance().removeAlarm(name);
+                        Adapter.getInstance().syncAlarm();
+                    }
+                });
+        dialog.create();
+        if (! ((Activity) mContext).isFinishing()) {
+            dialog.show();
+        }
+//                    dialog.show();
+    }
+    public static void createDialog(){
+
+        createDialog("");
+    }
+    public static void createDialog(String name) {
+        final Dialog dialog = new Dialog(mContext);
+
+        String _topic="",_name="",_content="",_respone="";
+        boolean wanaEdit=false;
+        final Adapter adapterNullAble = Adapter.getInstance();
+        JSONObject deviceJsonObj = adapterNullAble.getAlarm(name);
+        if(!name.equals("")){
+            wanaEdit = true;
+            try {
+                _topic=deviceJsonObj.getString("topic");
+                _name=deviceJsonObj.getString("name");
+                _content=deviceJsonObj.getString("content");
+                _respone=deviceJsonObj.getString("respone");
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        dialog.setContentView(R.layout.dialog_add_alarm);
+        final EditText nameAddAlarmTxt = dialog.findViewById(R.id.nameAddAlarmTxt);
+        final EditText topicAddAlarmTxt = dialog.findViewById(R.id.topicAddAlarmTxt);
+        final EditText contentAddAlarmTxt = dialog.findViewById(R.id.contentAddAlarmTxt);
+        final EditText responeAddAlarmTxt = dialog.findViewById(R.id.responeAddAlarmTxt);
+
+        Button addAddAlarmBtn = dialog.findViewById(R.id.addAddAlarmBtn);
+        Button cloneAddAlarmBtn = dialog.findViewById(R.id.cloneAddAlarmBtn);
+        nameAddAlarmTxt.setText(_name);
+        topicAddAlarmTxt.setText(_topic);
+        contentAddAlarmTxt.setText(_content);
+        responeAddAlarmTxt.setText(_respone);
+
+        final boolean finalWanaEdit = wanaEdit;
+        final String final_name = _name;
+        addAddAlarmBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if(adapterNullAble != null){
+                    if(finalWanaEdit){
+                        adapterNullAble.editAlarm(final_name,nameAddAlarmTxt.getText().toString(),
+                                topicAddAlarmTxt.getText().toString(),
+                                contentAddAlarmTxt.getText().toString(),
+                                responeAddAlarmTxt.getText().toString());
+                    }else{
+                        adapterNullAble.addAlarm(nameAddAlarmTxt.getText().toString(),
+                                topicAddAlarmTxt.getText().toString(),
+                                contentAddAlarmTxt.getText().toString(),
+                                responeAddAlarmTxt.getText().toString());
+                    }
+
+                }
+                dialog.cancel();
+
+            }
+        });
+        cloneAddAlarmBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(adapterNullAble != null){
+                    adapterNullAble.addAlarm(nameAddAlarmTxt.getText().toString()+ " - coppy",
+                            topicAddAlarmTxt.getText().toString(),
+                            contentAddAlarmTxt.getText().toString(),
+                            responeAddAlarmTxt.getText().toString());
+                }
+                dialog.cancel();
+            }
+        });
+
+        if (! ((Activity) mContext).isFinishing()) {
+            dialog.show();
+        }
+    }
+
 }
