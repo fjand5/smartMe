@@ -1,13 +1,17 @@
 package com.example.sm.Presenter.Utils;
 
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
+import com.example.sm.Presenter.DeviceListView.Adapter;
+import com.example.sm.R;
 import com.example.sm.view.RingActivity;
 
 import org.json.JSONArray;
@@ -89,5 +93,6 @@ public class Utils {
             return false;
         }
     }
+
 
 }

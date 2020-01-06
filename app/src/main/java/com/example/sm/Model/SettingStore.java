@@ -11,16 +11,15 @@ import java.util.ArrayList;
 public class SettingStore {
     private static SettingStore instance;
 
-    ArrayList<OnNewSettingListenner> onNewSettingListennerArrayList;
+    volatile ArrayList<OnNewSettingListenner> onNewSettingListennerArrayList;
 
     private SettingStore() {
-
-        MqttBroadcast.reSubcribe();
         MqttBroadcast.setOnMessageArrivedListenner(new MqttBroadcast.OnMessageArrivedListenner() {
             @Override
             public void onMessageArrived(String topic, MqttMessage message) {
                 if(onNewSettingListennerArrayList == null)
                     return;
+
 
 
                 for (OnNewSettingListenner msg:
@@ -33,7 +32,6 @@ public class SettingStore {
                             "/",
                             ""
                     );
-
                     msg.onNewSetting(key,new String(message.getPayload()));
                 }
             }
@@ -43,12 +41,15 @@ public class SettingStore {
     public static SettingStore getInstance(){
         if (instance == null)
             instance = new SettingStore();
+//        MqttBroadcast.reSubcribe();
         return instance;
     }
     public void setOnNewSettingListenner(OnNewSettingListenner onNewSettingListenner) {
         if(onNewSettingListennerArrayList == null)
             onNewSettingListennerArrayList = new ArrayList<>();
+
         this.onNewSettingListennerArrayList.add(onNewSettingListenner);
+        MqttBroadcast.reSubcribe();
     }
 
     public void commitSetting(String key, String newSetting){

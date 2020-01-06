@@ -19,10 +19,12 @@ import org.json.JSONObject;
 public class RingActivity extends Activity {
     Button gotitBtn;
     static Ringtone ringtone;
+    String msg="OK";
     @Override
     protected void onCreate( Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ring);
+        msg = getIntent().getStringExtra("msg");
         initView();
         addEvent();
         settupRingtone();
@@ -57,6 +59,7 @@ public class RingActivity extends Activity {
 
     private void initView() {
         gotitBtn = findViewById(R.id.gotitBtn);
+        gotitBtn.setText(msg);
     }
     static void playRingtone(){
         if(ringtone!=null)

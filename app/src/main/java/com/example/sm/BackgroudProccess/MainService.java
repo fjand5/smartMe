@@ -37,6 +37,8 @@ public class MainService extends Service {
     static RemoteViews rv;
     int MAIN_ID = 1;
     String name;
+
+
     public static MainService getInstance(){
 
         if(instance==null)
@@ -67,6 +69,7 @@ public class MainService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         mqttBroadcast.startMe(this);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             initFore();
         }

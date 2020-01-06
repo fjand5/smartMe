@@ -19,12 +19,20 @@ import static com.example.sm.Presenter.Utils.Utils.isValidJsonArray;
 public class AlarmSetting {
     static AlarmSetting instance;
     volatile String settingData="";
+    static OnUpdateSettingDataListenner _onUpdateSettingDataListenner;
+
+    public void setOnUpdateSettingDataListenner(OnUpdateSettingDataListenner onUpdateSettingDataListenner) {
+        _onUpdateSettingDataListenner = onUpdateSettingDataListenner;
+    }
+
+
     private AlarmSetting(){
         SettingStore.getInstance().setOnNewSettingListenner(new SettingStore.OnNewSettingListenner() {
             @Override
             public void onNewSetting(String key, String inComeNewSetting) {
                 if(key.equals(AlarmSetting.class.getName())){
                     settingData = inComeNewSetting;
+                    _onUpdateSettingDataListenner.onUpdateSettingData();
                 }
 
             }
@@ -38,7 +46,7 @@ public class AlarmSetting {
         return instance;
     };
 
-    public void addAlarm( String name, String topic, String content){
+    public void addAlarm( String name, String topic, String content, String respone){
         JSONArray tmp = getListAlarm();
         for (int i = 0; i<tmp.length(); i++){
             try {
@@ -55,6 +63,7 @@ public class AlarmSetting {
             jsonObject.put("name",name);
             jsonObject.put("topic",topic);
             jsonObject.put("content",content);
+            jsonObject.put("respone",respone);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -77,13 +86,14 @@ public class AlarmSetting {
         return new JSONObject();
     }
     @SuppressLint("NewApi")
-    public void editDevice(Context context,String beforName, String name, String topic, String content){
+    public void editAlarm(String beforName, String name, String topic, String content, String respone){
         JSONArray tmp = getListAlarm();
         JSONObject jsonObject  = new JSONObject();
         try {
             jsonObject.put("name",name);
             jsonObject.put("topic",topic);
             jsonObject.put("content",content);
+            jsonObject.put("respone",respone);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -103,7 +113,7 @@ public class AlarmSetting {
         setListAlarm(tmp);
     }
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    public void removeDevice(Context context, String name){
+    public void removeAlarm(String name){
         JSONArray jsonArray  = getListAlarm();
         for (int i =0;i<jsonArray.length();i++) {
             try {
@@ -141,5 +151,7 @@ public class AlarmSetting {
         SettingStore.getInstance().commitSetting(AlarmSetting.class.getName(),jsonArray.toString());
 
     }
-
+    public interface OnUpdateSettingDataListenner{
+        void onUpdateSettingData();
+    }
 }

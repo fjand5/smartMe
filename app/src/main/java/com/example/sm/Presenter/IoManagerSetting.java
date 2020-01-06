@@ -1,5 +1,7 @@
 package com.example.sm.Presenter;
 
+import android.util.Log;
+
 import com.example.sm.Model.SettingStore;
 import com.example.sm.Presenter.Utils.Utils;
 
@@ -55,6 +57,7 @@ public class IoManagerSetting {
     public static IoManagerSetting getInstance() {
         if(instance == null)
             instance = new IoManagerSetting();
+
         return instance;
     }
     public void setSettingData(String topic, String content){

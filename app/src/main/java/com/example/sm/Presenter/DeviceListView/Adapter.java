@@ -22,6 +22,8 @@ import android.widget.TimePicker;
 
 import androidx.annotation.RequiresApi;
 
+import com.example.sm.BackgroudProccess.MainService;
+import com.example.sm.BackgroudProccess.MqttBroadcast;
 import com.example.sm.Model.SettingStore;
 import com.example.sm.Presenter.IoManagerSetting;
 import com.example.sm.Presenter.ListDeviceInfo;
@@ -48,20 +50,10 @@ public class Adapter extends ArrayAdapter<Item> {
         if(instance == null){
             instance = new Adapter(context,resource,objects);
         }
-        instance.syncDevice();
-        return instance;
-    }
-    static public Adapter getInstance(){
-        return instance;
-    }
-    public Adapter(Context context, int resource, List<Item> objects) {
-        super(context, resource, objects);
-        mContext = context;
-        listItem = objects;
         IoManagerSetting.getInstance().setOnUpdateSettingDataListenner(new IoManagerSetting.OnUpdateSettingDataListenner() {
             @Override
             public void onUpdateSettingData() {
-                syncDevice();
+                instance.syncDevice();
             }
         });
         MqttConnectManager.getInstance().setOnEventMqtt(new MqttConnectManager.Callback() {
@@ -82,11 +74,11 @@ public class Adapter extends ArrayAdapter<Item> {
                 try {
                     JSONObject jsonObject = new JSONObject(content);
                     for (Item item:
-                         listItem) {
+                            listItem) {
                         item.setCurBeginTime(jsonObject.getJSONObject(item.getName()).getInt("start"));
                         item.setCurEndTime(jsonObject.getJSONObject(item.getName()).getInt("end"));
                     }
-                    notifyDataSetInvalidated();
+                    instance.notifyDataSetInvalidated();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -94,6 +86,19 @@ public class Adapter extends ArrayAdapter<Item> {
 
             }
         });
+        instance.syncDevice();
+
+        return instance;
+    }
+    static public Adapter getInstance(){
+        return instance;
+    }
+
+    public Adapter(Context context, int resource, List<Item> objects) {
+        super(context, resource, objects);
+        mContext = context;
+        listItem = objects;
+
     }
 
 
@@ -185,7 +190,7 @@ public class Adapter extends ArrayAdapter<Item> {
         nameDeviceTxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                createDialog(mContext,nameDeviceTxt.getText().toString());
+                createDialog(nameDeviceTxt.getText().toString());
             }
         });
         deleteDeviceTxt.setOnClickListener(new View.OnClickListener() {
@@ -270,11 +275,11 @@ public class Adapter extends ArrayAdapter<Item> {
         notifyDataSetInvalidated();
     }
 
-    public void createDialog(Context context){
-        createDialog(context,"");
+    public void createDialog(){
+        createDialog("");
     }
-    public void createDialog(Context context,String name) {
-        final Dialog dialog = new Dialog(context);
+    public void createDialog(String name) {
+        final Dialog dialog = new Dialog(mContext);
         dialog.setContentView(R.layout.dialog_add_device);
         String _topic="",_name="",_on="",_off="";
         String _startTime="",_endTime="";

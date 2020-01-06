@@ -13,14 +13,14 @@
         android:orientation="horizontal"
         android:weightSum="2">
         <TextView
-            android:hint="Giá trị cảm biến"
-            android:id="@+id/sensorValueTxt"
+            android:hint="Tên"
+            android:id="@+id/alarmNameTxt"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:textSize="@dimen/textSize"
             android:layout_height="wrap_content"/>
         <Button
-            android:id="@+id/addListennerBtn"
+            android:id="@+id/deleteAlarmBtn"
             android:text="On"
             android:layout_weight="1"
             android:layout_width="0dp"

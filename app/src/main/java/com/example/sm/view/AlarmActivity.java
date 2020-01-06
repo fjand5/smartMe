@@ -15,10 +15,13 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 
+import com.example.sm.Presenter.AlarmListView.Adapter;
+import com.example.sm.Presenter.AlarmListView.Item;
 import com.example.sm.Presenter.AlarmSetting;
 import com.example.sm.Presenter.MqttConnectManager;
 import com.example.sm.R;
@@ -29,23 +32,46 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.example.sm.Presenter.Utils.Utils.callActivity;
 
 
 public class AlarmActivity extends Activity {
    FloatingActionButton addAlarmBtn;
    static Context mContext;
+
+    Context mContext1;
+   ListView alarmLsv;
+   List<Item> alarmItems;
+   Adapter  alarmAdapter;
+
     @Override
     protected void onPause() {
+
+
+
         super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        alarmItems = new ArrayList<>();
+        alarmAdapter = Adapter.getInstance(this, R.layout.item_alarm,alarmItems);
+
+        alarmLsv.setAdapter(alarmAdapter);
+        alarmAdapter.notifyDataSetInvalidated();
+        super.onResume();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        mContext1 = this;
         setContentView(R.layout.activity_alarm_manager);
         initView();
+        addEvent();
 
 
 
@@ -54,11 +80,20 @@ public class AlarmActivity extends Activity {
 
 
     private void addEvent() {
-
+        addAlarmBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Adapter.getInstance().createDialog(mContext1);
+            }
+        });
     }
 
     private void initView() {
         addAlarmBtn =  findViewById(R.id.addAlarmBtn);
+        alarmLsv = findViewById(R.id.alarmLsv);
+
+
+
     }
 
     public static void initAlarmSystem(Context context){
@@ -71,8 +106,7 @@ public class AlarmActivity extends Activity {
 
             @Override
             public void onConnect() {
-                AlarmSetting.getInstance().addAlarm("tivi","luat/espAL/tx",
-                        "{\"cmd\":\"ALR\"}");
+
             }
 
             @RequiresApi(api = Build.VERSION_CODES.Q)

@@ -57,7 +57,10 @@ public class IoManagerActivity extends Activity {
                 }
             }
         }).start();
-
+        itemList = new ArrayList<>();
+        deviceAdapter = Adapter.getInstance(this,R.layout.item_io_device,itemList);
+        ioDeviceLsv.setAdapter(deviceAdapter);
+        deviceAdapter.notifyDataSetInvalidated();
         super.onResume();
     }
 
@@ -73,10 +76,7 @@ public class IoManagerActivity extends Activity {
         setContentView(R.layout.activity_io_manager);
         initView();
         addEvent();
-        itemList = new ArrayList<>();
-        deviceAdapter = Adapter.getInstance(this,R.layout.item_io_device,itemList);
-        ioDeviceLsv.setAdapter(deviceAdapter);
-        deviceAdapter.notifyDataSetInvalidated();
+
         mContext =this;
 
     }
@@ -88,7 +88,7 @@ public class IoManagerActivity extends Activity {
         floatingActionButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                Adapter.getInstance().createDialog(mContext);
+                Adapter.getInstance().createDialog();
                 return false;
             }
         });
