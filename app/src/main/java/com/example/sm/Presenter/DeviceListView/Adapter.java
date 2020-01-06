@@ -190,7 +190,7 @@ public class Adapter extends ArrayAdapter<Item> {
         nameDeviceTxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                createDialog(nameDeviceTxt.getText().toString());
+                createDialog(view.getContext(),nameDeviceTxt.getText().toString());
             }
         });
         deleteDeviceTxt.setOnClickListener(new View.OnClickListener() {
@@ -215,7 +215,12 @@ public class Adapter extends ArrayAdapter<Item> {
                             }
                         });
                 dialog.create();
-                dialog.show();
+                if (! ((Activity) mContext).isFinishing()) {
+                    dialog.show();
+                }else{
+                    Log.d("htl","isFinishing DV");
+                }
+//                dialog.show();
             }
         });
 
@@ -275,11 +280,11 @@ public class Adapter extends ArrayAdapter<Item> {
         notifyDataSetInvalidated();
     }
 
-    public void createDialog(){
-        createDialog("");
+    public static void createDialog(Context context){
+        createDialog(context,"");
     }
-    public void createDialog(String name) {
-        final Dialog dialog = new Dialog(mContext);
+    public static void createDialog(Context context,String name) {
+        final Dialog dialog = new Dialog(context);
         dialog.setContentView(R.layout.dialog_add_device);
         String _topic="",_name="",_on="",_off="";
         String _startTime="",_endTime="";
@@ -338,7 +343,6 @@ public class Adapter extends ArrayAdapter<Item> {
 
                 }
                 dialog.cancel();
-
             }
         });
         cloneAddDeviceBtn.setOnClickListener(new View.OnClickListener() {
@@ -355,9 +359,11 @@ public class Adapter extends ArrayAdapter<Item> {
                 dialog.cancel();
             }
         });
-
-
+        if (! ((Activity) context).isFinishing()) {
             dialog.show();
+        }
+
+//            dialog.show();
 
 
     }

@@ -31,12 +31,19 @@ public class IoManagerActivity extends Activity {
     List<Item> itemList;
     FloatingActionButton floatingActionButton;
     volatile boolean runSignal = false;
-    Context mContext;
+
     String topic="";
     String content="";
     @Override
     protected void onResume() {
+
+        super.onResume();
         SettingStore.getInstance();
+        itemList = new ArrayList<>();
+        deviceAdapter = Adapter.getInstance(this,R.layout.item_io_device,itemList);
+        ioDeviceLsv.setAdapter(deviceAdapter);
+        deviceAdapter.notifyDataSetInvalidated();
+
         runSignal = true;
         new Thread(new Runnable() {
             @Override
@@ -54,20 +61,17 @@ public class IoManagerActivity extends Activity {
                         e.printStackTrace();
                     }
 
+
                 }
             }
         }).start();
-        itemList = new ArrayList<>();
-        deviceAdapter = Adapter.getInstance(this,R.layout.item_io_device,itemList);
-        ioDeviceLsv.setAdapter(deviceAdapter);
-        deviceAdapter.notifyDataSetInvalidated();
-        super.onResume();
     }
 
     @Override
     protected void onPause() {
         runSignal = false;
         super.onPause();
+
     }
 
     @Override
@@ -77,7 +81,8 @@ public class IoManagerActivity extends Activity {
         initView();
         addEvent();
 
-        mContext =this;
+
+
 
     }
 
@@ -88,14 +93,14 @@ public class IoManagerActivity extends Activity {
         floatingActionButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                Adapter.getInstance().createDialog();
+                Adapter.getInstance().createDialog(view.getContext());
                 return false;
             }
         });
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final Dialog dialog = new Dialog(mContext);
+                final Dialog dialog = new Dialog(view.getContext());
                 dialog.setContentView(R.layout.dialog_setting_signal);
                 final EditText topicSignalTxt = dialog.findViewById(R.id.topicSignalTxt);
                 final EditText nameSignalTxt = dialog.findViewById(R.id.nameSignalTxt);

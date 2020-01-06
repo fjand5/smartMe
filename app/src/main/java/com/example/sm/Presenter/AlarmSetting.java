@@ -7,6 +7,7 @@ import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
+import com.example.sm.BackgroudProccess.MqttBroadcast;
 import com.example.sm.Model.SettingStore;
 import com.example.sm.Presenter.Utils.Utils;
 
@@ -22,6 +23,8 @@ public class AlarmSetting {
     static OnUpdateSettingDataListenner _onUpdateSettingDataListenner;
 
     public void setOnUpdateSettingDataListenner(OnUpdateSettingDataListenner onUpdateSettingDataListenner) {
+        MqttBroadcast.reSubcribe();
+
         _onUpdateSettingDataListenner = onUpdateSettingDataListenner;
     }
 

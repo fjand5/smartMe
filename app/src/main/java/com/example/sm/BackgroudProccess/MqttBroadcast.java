@@ -103,14 +103,12 @@ public class MqttBroadcast extends BroadcastReceiverExt {
             client.subscribe(_topicRx, 2, mContext, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
-                    Log.d("htl","reSubcribe onSuccess");
                     if(onConnectStatusChange != null)
                         onConnectStatusChange.onConnect();
                 }
 
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    Log.d("htl","reSubcribe onFailure");
                     if(onConnectStatusChange != null)
                         onConnectStatusChange.onDisconnect();
                 }

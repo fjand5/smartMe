@@ -41,15 +41,14 @@ public class SettingStore {
     public static SettingStore getInstance(){
         if (instance == null)
             instance = new SettingStore();
-//        MqttBroadcast.reSubcribe();
         return instance;
     }
+
     public void setOnNewSettingListenner(OnNewSettingListenner onNewSettingListenner) {
         if(onNewSettingListennerArrayList == null)
             onNewSettingListennerArrayList = new ArrayList<>();
 
         this.onNewSettingListennerArrayList.add(onNewSettingListenner);
-        MqttBroadcast.reSubcribe();
     }
 
     public void commitSetting(String key, String newSetting){

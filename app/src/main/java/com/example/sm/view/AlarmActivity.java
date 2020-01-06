@@ -40,9 +40,6 @@ import static com.example.sm.Presenter.Utils.Utils.callActivity;
 
 public class AlarmActivity extends Activity {
    FloatingActionButton addAlarmBtn;
-   static Context mContext;
-
-    Context mContext1;
    ListView alarmLsv;
    List<Item> alarmItems;
    Adapter  alarmAdapter;
@@ -56,19 +53,20 @@ public class AlarmActivity extends Activity {
     }
 
     @Override
+
     protected void onResume() {
+
+        super.onResume();
         alarmItems = new ArrayList<>();
         alarmAdapter = Adapter.getInstance(this, R.layout.item_alarm,alarmItems);
 
         alarmLsv.setAdapter(alarmAdapter);
         alarmAdapter.notifyDataSetInvalidated();
-        super.onResume();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mContext1 = this;
         setContentView(R.layout.activity_alarm_manager);
         initView();
         addEvent();
@@ -83,7 +81,7 @@ public class AlarmActivity extends Activity {
         addAlarmBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Adapter.getInstance().createDialog(mContext1);
+                Adapter.createDialog(view.getContext());
             }
         });
     }
@@ -96,8 +94,7 @@ public class AlarmActivity extends Activity {
 
     }
 
-    public static void initAlarmSystem(Context context){
-        mContext=context;
+    public static void initAlarmSystem(final Context context){
         MqttConnectManager.getInstance().setOnEventMqtt(new MqttConnectManager.Callback() {
             @Override
             public void onDisconnect() {
@@ -124,8 +121,7 @@ public class AlarmActivity extends Activity {
                          String name = jsonArray.getJSONObject(i).getString("name");
                         if(alarmTopic.equals(topic)
                         && alarmContent.equals(content)){
-                            Log.d("htl","bao dong");
-                            callRingActiity(name);
+                            callRingActiity(context, name);
 
                         }
                     } catch (JSONException e) {
@@ -140,8 +136,8 @@ public class AlarmActivity extends Activity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
-    private static void callRingActiity(String msg) {
-        callActivity(mContext, RingActivity.class,msg,true);
+    private static void callRingActiity(Context context, String msg) {
+        callActivity(context, RingActivity.class,msg,true);
 
     }
 }

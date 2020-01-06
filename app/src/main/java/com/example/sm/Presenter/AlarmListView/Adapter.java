@@ -1,5 +1,6 @@
 package com.example.sm.Presenter.AlarmListView;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -24,7 +25,9 @@ import com.example.sm.Presenter.AlarmSetting;
 import com.example.sm.Presenter.IoManagerSetting;
 import com.example.sm.Presenter.ListDeviceInfo;
 import com.example.sm.Presenter.MqttConnectManager;
+import com.example.sm.Presenter.Utils.Utils;
 import com.example.sm.R;
+import com.example.sm.view.AlarmActivity;
 
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONArray;
@@ -82,16 +85,18 @@ public class Adapter extends ArrayAdapter<Item> {
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         View v = convertView;
 
-        if(v == null){
+        if(v == null) {
             LayoutInflater layoutInflater = LayoutInflater.from(mContext);
-            v = layoutInflater.inflate(R.layout.item_alarm,null);
+            v = layoutInflater.inflate(R.layout.item_alarm, null);
+        }
             final TextView name = v.findViewById(R.id.alarmNameTxt);
             final Button deleteAlarmBtn = v.findViewById(R.id.deleteAlarmBtn);
             name.setText(listItem.get(position).name);
             deleteAlarmBtn.setOnClickListener(new View.OnClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.Q)
                 @Override
                 public void onClick(View view) {
-                    AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(view.getContext());
                     dialog.setTitle("Xác nhận !")
                             .setMessage("Bạn có muốn xóa cảnh báo này không ?")
                             .setIcon(R.drawable.icon)
@@ -110,16 +115,19 @@ public class Adapter extends ArrayAdapter<Item> {
                                 }
                             });
                     dialog.create();
-                    dialog.show();
+                    if (! ((Activity) mContext).isFinishing()) {
+                        dialog.show();
+                    }
+//                    dialog.show();
                 }
             });
             name.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    createDialog(name.getText().toString());
+                    createDialog(view.getContext(), name.getText().toString());
                 }
             });
-        }
+
         return v;
     }
 
@@ -159,13 +167,13 @@ public class Adapter extends ArrayAdapter<Item> {
     }
 
 
-    public void createDialog(Context context){
+    public static void createDialog(Context context){
 
-        createDialog("");
+        createDialog(context,"");
     }
-    public void createDialog(String name) {
-        final Dialog dialog = new Dialog(mContext);
-        dialog.setContentView(R.layout.dialog_add_alarm);
+    public static void createDialog(Context context,String name) {
+        final Dialog dialog = new Dialog(context);
+
         String _topic="",_name="",_content="",_respone="";
         boolean wanaEdit=false;
         final Adapter adapterNullAble = Adapter.getInstance();
@@ -182,6 +190,7 @@ public class Adapter extends ArrayAdapter<Item> {
                 e.printStackTrace();
             }
         }
+        dialog.setContentView(R.layout.dialog_add_alarm);
         final EditText nameAddAlarmTxt = dialog.findViewById(R.id.nameAddAlarmTxt);
         final EditText topicAddAlarmTxt = dialog.findViewById(R.id.topicAddAlarmTxt);
         final EditText contentAddAlarmTxt = dialog.findViewById(R.id.contentAddAlarmTxt);
@@ -231,8 +240,12 @@ public class Adapter extends ArrayAdapter<Item> {
             }
         });
 
+        if (! ((Activity) context).isFinishing()) {
+            dialog.show();
+        }else{
+            Log.d("htl","isFinishing LV");
+        }
 
-        dialog.show();
 
     }
 }

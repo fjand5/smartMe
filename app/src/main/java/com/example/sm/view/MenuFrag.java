@@ -1,8 +1,10 @@
 package com.example.sm.view;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,28 +30,29 @@ public class MenuFrag extends Fragment {
             @RequiresApi(api = Build.VERSION_CODES.Q)
             @Override
             public void onClick(View view) {
-               callAlarmActivity();
+               callAlarmActivity(view.getContext());
             }
         });
         ioManagerBtn.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.Q)
             @Override
             public void onClick(View view) {
-                callIoManagerActivity();
+                callIoManagerActivity(view.getContext());
             }
         });
         return v;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
-    private void callAlarmActivity() {
-        callActivity(getActivity(),AlarmActivity.class);
+    private void callAlarmActivity(Context context) {
+        callActivity(context,AlarmActivity.class);
+
 
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
-    private void callIoManagerActivity() {
-        callActivity(getActivity(),IoManagerActivity.class);
+    private void callIoManagerActivity(Context context) {
+        callActivity(context,IoManagerActivity.class);
 
     }
 }
